@@ -48,18 +48,62 @@ var (
 	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 	procSetConsoleCtrlHandler      = modkernel32.NewProc("SetConsoleCtrlHandler")
 
-	procVirtualAllocEx             = modkernel32.NewProc("VirtualAllocEx")
-	procGetProcAddress             = modkernel32.NewProc("GetProcAddress")
-	procCreateRemoteThread         = modkernel32.NewProc("CreateRemoteThread")
-	procLoadLibraryA               = modkernel32.NewProc("LoadLibraryA")
+	procVirtualAllocEx     = modkernel32.NewProc("VirtualAllocEx")
+	procVirtualAlloc       = modkernel32.NewProc("VirtualAlloc")
+	procGetProcAddress     = modkernel32.NewProc("GetProcAddress")
+	procCreateRemoteThread = modkernel32.NewProc("CreateRemoteThread")
+	procLoadLibraryA       = modkernel32.NewProc("LoadLibraryA")
+	procCreateProcessA     = modkernel32.NewProc("CreateProcessA")
 )
 
+func CreateProcessA(lpApplicationName *string,
+	lpCommandLine string,
+	lpProcessAttributes *syscall.SecurityAttributes,
+	lpThreadAttributes *syscall.SecurityAttributes,
+	bInheritHandles bool,
+	dwCreationFlags uint32,
+	lpEnvironment *string,
+	lpCurrentDirectory *uint16,
+	lpStartupInfo *syscall.StartupInfo,
+	lpProcessInformation *syscall.ProcessInformation) {
+
+	inherit := 0
+	if bInheritHandles {
+		inherit = 1
+	}
+
+	procCreateProcessA.Call(
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(*lpApplicationName))),
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(lpCommandLine))),
+		uintptr(unsafe.Pointer(lpProcessAttributes)),
+		uintptr(unsafe.Pointer(lpThreadAttributes)),
+		uintptr(inherit),
+		uintptr(dwCreationFlags),
+		uintptr(unsafe.Pointer(lpEnvironment)),
+		uintptr(unsafe.Pointer(lpCurrentDirectory)),
+		uintptr(unsafe.Pointer(lpStartupInfo)),
+		uintptr(unsafe.Pointer(lpProcessInformation)))
+}
+
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa366890(v=vs.85).aspx
-func VirtualAllocEx(hProcess HANDLE, lpAddress *uint32, dwSize uint32, flAllocationType int, flProtect int)  (addr uintptr, err error) {
+func VirtualAllocEx(hProcess HANDLE, lpAddress int, dwSize int, flAllocationType int, flProtect int) (addr uintptr, err error) {
 	ret, _, err := procVirtualAllocEx.Call(
-		uintptr(hProcess),
-		uintptr(*lpAddress),
-		uintptr(dwSize),
+		uintptr(hProcess),  // The handle to a process.
+		uintptr(lpAddress), // The pointer that specifies a desired starting address for the region of pages that you want to allocate.
+		uintptr(dwSize),    // The size of the region of memory to allocate, in bytes.
+		uintptr(flAllocationType),
+		uintptr(flProtect))
+	if int(ret) == 0 {
+		return ret, err
+	}
+	return ret, nil
+}
+
+// https://msdn.microsoft.com/en-us/library/windows/desktop/aa366887(v=vs.85).aspx
+func VirtualAlloc(lpAddress int, dwSize int, flAllocationType int, flProtect int) (addr uintptr, err error) {
+	ret, _, err := procVirtualAlloc.Call(
+		uintptr(lpAddress), // The starting address of the region to allocate
+		uintptr(dwSize),    // The size of the region of memory to allocate, in bytes.
 		uintptr(flAllocationType),
 		uintptr(flProtect))
 	if int(ret) == 0 {
@@ -69,7 +113,7 @@ func VirtualAllocEx(hProcess HANDLE, lpAddress *uint32, dwSize uint32, flAllocat
 }
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms683212(v=vs.85).aspx
-func GetProcAddress(hProcess HANDLE, procname string)  (addr uintptr, err error) {
+func GetProcAddress(hProcess HANDLE, procname string) (addr uintptr, err error) {
 	var pn uintptr
 
 	if procname == "" {
@@ -78,7 +122,7 @@ func GetProcAddress(hProcess HANDLE, procname string)  (addr uintptr, err error)
 		pn = uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(procname)))
 	}
 
-	ret, _, err := procGetProcAddress.Call(uintptr(hProcess),pn)
+	ret, _, err := procGetProcAddress.Call(uintptr(hProcess), pn)
 	if int(ret) == 0 {
 		return ret, err
 	}
@@ -87,11 +131,11 @@ func GetProcAddress(hProcess HANDLE, procname string)  (addr uintptr, err error)
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682437(v=vs.85).aspx
 // Credit: https://github.com/contester/runlib/blob/master/win32/win32_windows.go#L577
-func CreateRemoteThread(process HANDLE, sa *syscall.SecurityAttributes,
-	stackSize uint32, startAddress uint32,	parameter uintptr, creationFlags uint32) (syscall.Handle, uint32, error) {
+func CreateRemoteThread(hprocess HANDLE, sa *syscall.SecurityAttributes,
+	stackSize uint32, startAddress uint32, parameter uintptr, creationFlags uint32) (syscall.Handle, uint32, error) {
 	var threadId uint32
 	r1, _, e1 := procCreateRemoteThread.Call(
-		uintptr(process),
+		uintptr(hprocess),
 		uintptr(unsafe.Pointer(sa)),
 		uintptr(stackSize),
 		uintptr(startAddress),
