@@ -1,6 +1,16 @@
 # Notes
 The original [repository](https://github.com/AllenDang/w32) appears to be abandoned. This mirror has some of my own additions plus updates from other forks of the original project. 
 
+## Additional APIs compared to original repo:
+* procGetWindowTextW
+* procGetForegroundWindow
+* procVirtualAllocEx
+* procVirtualAlloc
+* procGetProcAddress
+* procCreateRemoteThread
+* procLoadLibraryA
+* procCreateProcessA
+
 About w32
 ==========
 

@@ -121,7 +121,33 @@ var (
 	procCallNextHookEx                = moduser32.NewProc("CallNextHookEx")
 	procRegisterHotKey                = moduser32.NewProc("RegisterHotKey")
 	procUnregisterHotKey              = moduser32.NewProc("UnregisterHotKey")
+
+	procGetWindowTextW      = moduser32.NewProc("GetWindowTextW")
+	procGetForegroundWindow = moduser32.NewProc("GetForegroundWindow")
 )
+
+func GetWindowTextW(hwnd syscall.Handle, str *uint16, maxCount int32) (len int32, err error) {
+	r0, _, e1 := syscall.Syscall(procGetWindowTextW.Addr(), 3, uintptr(hwnd), uintptr(unsafe.Pointer(str)), uintptr(maxCount))
+	len = int32(r0)
+	if len == 0 {
+		if e1 != 0 {
+			err = error(e1)
+		} else {
+			err = syscall.EINVAL
+		}
+	}
+	return
+}
+
+func GetForegroundWindow() (hwnd syscall.Handle, err error) {
+	r0, _, e1 := syscall.Syscall(procGetForegroundWindow.Addr(), 0, 0, 0, 0)
+	if e1 != 0 {
+		err = error(e1)
+		return
+	}
+	hwnd = syscall.Handle(r0)
+	return
+}
 
 func RegisterClassEx(wndClassEx *WNDCLASSEX) ATOM {
 	ret, _, _ := procRegisterClassEx.Call(uintptr(unsafe.Pointer(wndClassEx)))
@@ -812,7 +838,7 @@ func MapVirtualKeyEx(uCode, uMapType uint, dwhkl HKL) uint {
 	return uint(ret)
 }
 
-func GetAsyncKeyState(vKey int) uint16 {
+func GetAsyncKeyState(vKey int) (keyState uint16) {
 	ret, _, _ := procGetAsyncKeyState.Call(uintptr(vKey))
 	return uint16(ret)
 }

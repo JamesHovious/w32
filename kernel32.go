@@ -48,13 +48,14 @@ var (
 	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 	procSetConsoleCtrlHandler      = modkernel32.NewProc("SetConsoleCtrlHandler")
 
-	procVirtualAllocEx     = modkernel32.NewProc("VirtualAllocEx")
-	procVirtualAlloc       = modkernel32.NewProc("VirtualAlloc")
-	procGetProcAddress     = modkernel32.NewProc("GetProcAddress")
-	procCreateRemoteThread = modkernel32.NewProc("CreateRemoteThread")
-	procLoadLibraryA       = modkernel32.NewProc("LoadLibraryA")
-	procCreateProcessA     = modkernel32.NewProc("CreateProcessA")
+	procVirtualAllocEx      = modkernel32.NewProc("VirtualAllocEx")
+	procVirtualAlloc        = modkernel32.NewProc("VirtualAlloc")
+	procGetProcAddress      = modkernel32.NewProc("GetProcAddress")
+	procCreateRemoteThread  = modkernel32.NewProc("CreateRemoteThread")
+	procLoadLibraryA        = modkernel32.NewProc("LoadLibraryA")
+	procCreateProcessA      = modkernel32.NewProc("CreateProcessA")
 )
+
 
 func CreateProcessA(lpApplicationName *string,
 	lpCommandLine string,
