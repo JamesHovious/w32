@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/viaMorgoth/w32"
+	"github.com/JamesHovious/w32"
 )
 
 //A simple message box example

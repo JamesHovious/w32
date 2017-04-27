@@ -3,7 +3,7 @@ package main
 
 import (
 <<<<<<< HEAD
-	"github.com/viaMorgoth/w32"
+	"github.com/JamesHovious/w32"
 	"syscall"
 	"unsafe"
 )
@@ -13,7 +13,7 @@ const (
 	"syscall"
 	"unsafe"
 
-	"github.com/viaMorgoth/w32"
+	"github.com/JamesHovious/w32"
 )
 
 const (

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"github.com/viaMorgoth/w32"
+	"github.com/JamesHovious/w32"
 	"strings"
 	"time"
 	"unsafe"

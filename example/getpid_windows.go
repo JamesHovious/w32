@@ -10,14 +10,14 @@ package main
 import (
 	"fmt"
 <<<<<<< HEAD
-	"github.com/viaMorgoth/w32"
+	"github.com/JamesHovious/w32"
 	"syscall"
 	"unsafe"
 =======
 	"syscall"
 	"unsafe"
 
-	"github.com/viaMorgoth/w32"
+	"github.com/JamesHovious/w32"
 >>>>>>> origin/dev
 )
 

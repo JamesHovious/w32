@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/viaMorgoth/w32"
+	"github.com/JamesHovious/w32"
 )
 
 func main() {
