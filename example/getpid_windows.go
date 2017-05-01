@@ -1,24 +1,16 @@
 // Adapted from https://gist.github.com/henkman/3083408
 // This example will return the PID of LSASS.exe
-<<<<<<< HEAD
-// This example must be run with Administrator privileges
-=======
 // This example must be run with Administrator privilges
->>>>>>> origin/dev
+
 package main
 
 import (
 	"fmt"
-<<<<<<< HEAD
+
 	"github.com/JamesHovious/w32"
-	"syscall"
-	"unsafe"
-=======
 	"syscall"
 	"unsafe"
 
-	"github.com/JamesHovious/w32"
->>>>>>> origin/dev
 )
 
 func main() {

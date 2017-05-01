@@ -1,15 +1,9 @@
 package main
 
 import (
-<<<<<<< HEAD
-	"github.com/JamesHovious/w32"
 	"syscall"
-=======
-	//	"fmt"
+
 	"github.com/JamesHovious/w32"
-	"syscall"
-	//	"unsafe"
->>>>>>> origin/dev
 )
 
 func main() {
@@ -35,8 +29,4 @@ func main() {
 	proc := "c:\\windows\\system32\\calc.exe"
 
 	w32.CreateProcessA(nil, proc, nil, nil, true, 0, nil, nil, &sI, &pI)
-<<<<<<< HEAD
-=======
-	//(argv0p, argvp, nil, nil, true, flags, createEnvBlock(attr.Env), dirp, si, pi)
->>>>>>> origin/dev
 }

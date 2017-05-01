@@ -917,5 +917,5 @@ type KBDLLHOOKSTRUCT struct {
 
 type HOOKPROC func(int, WPARAM, LPARAM) LRESULT
 
-+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms633498(v=vs.85).aspx
- +type WNDENUMPROC func(HWND, LPARAM) LRESULT
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms633498(v=vs.85).aspx
+type WNDENUMPROC func(HWND, LPARAM) LRESULT

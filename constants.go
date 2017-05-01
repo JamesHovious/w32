@@ -61,22 +61,6 @@ const (
 )
 
 const (
-	PROCESS_CREATE_PROCESS            = 0x0080
-	PROCESS_CREATE_THREAD             = 0x0002
-	PROCESS_DUP_HANDLE                = 0x0040
-	PROCESS_QUERY_INFORMATION         = 0x0400
-	PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-	PROCESS_SET_INFORMATION           = 0x0200
-	PROCESS_SET_QUOTA                 = 0x0100
-	PROCESS_SUSPEND_RESUME            = 0x0800
-	PROCESS_TERMINATE                 = 0x0001
-	PROCESS_VM_OPERATION              = 0x0008
-	PROCESS_VM_READ                   = 0x0010
-	PROCESS_VM_WRITE                  = 0x0020
-	SYNCHRONIZE                       = 0x00100000
-)
-
-const (
 	PAGE_EXECUTE           = 0x10
 	PAGE_EXECUTE_READ      = 0x20
 	PAGE_EXECUTE_READWRITE = 0x40
@@ -1381,6 +1365,7 @@ const (
 	PROCESS_VM_READ                   = 0x0010  //Required to read memory in a process using ReadProcessMemory.
 	PROCESS_VM_WRITE                  = 0x0020  //Required to write to memory in a process using WriteProcessMemory.
 	PROCESS_ALL_ACCESS                = 2035711 //This is not recommended.
+	SYNCHRONIZE                       = 0x00100000
 )
 
 // ListView messages
