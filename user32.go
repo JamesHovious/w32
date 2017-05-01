@@ -101,6 +101,7 @@ var (
 	procGetKeyboardState              = moduser32.NewProc("GetKeyboardState")
 	procMapVirtualKey                 = moduser32.NewProc("MapVirtualKeyExW")
 	procGetAsyncKeyState              = moduser32.NewProc("GetAsyncKeyState")
+	procGetKeyState                   = moduser32.NewProc("GetKeyState")
 	procToAscii                       = moduser32.NewProc("ToAscii")
 	procSwapMouseButton               = moduser32.NewProc("SwapMouseButton")
 	procGetCursorPos                  = moduser32.NewProc("GetCursorPos")
@@ -840,6 +841,11 @@ func MapVirtualKeyEx(uCode, uMapType uint, dwhkl HKL) uint {
 
 func GetAsyncKeyState(vKey int) (keyState uint16) {
 	ret, _, _ := procGetAsyncKeyState.Call(uintptr(vKey))
+	return uint16(ret)
+}
+
+func GetKeyState(vKey int) (keyState uint16) {
+	ret, _, _ := procGetKeyState.Call(uintptr(vKey))
 	return uint16(ret)
 }
 
