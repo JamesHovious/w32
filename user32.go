@@ -125,7 +125,63 @@ var (
 
 	procGetWindowTextW      = moduser32.NewProc("GetWindowTextW")
 	procGetForegroundWindow = moduser32.NewProc("GetForegroundWindow")
+
+	procSetForegroundWindow = moduser32.NewProc("SetForegroundWindow")
+	procFindWindowW         = moduser32.NewProc("FindWindowW")
+	procFindWindowExW       = moduser32.NewProc("FindWindowExW")
+	procGetClassName        = moduser32.NewProc("GetClassNameW")
+	procEnumChildWindows    = moduser32.NewProc("EnumChildWindows")
 )
+
+// https://github.com/AllenDang/w32/pull/62/commits/bf59645b86663a54dffb94ca82683cc0610a6de3
+func GetClassNameW(hwnd HWND) string {
+	buf := make([]uint16, 255)
+	procGetClassName.Call(
+		uintptr(hwnd),
+		uintptr(unsafe.Pointer(&buf[0])),
+		uintptr(255))
+
+	return syscall.UTF16ToString(buf)
+}
+
+// https://github.com/AllenDang/w32/pull/62/commits/bf59645b86663a54dffb94ca82683cc0610a6de3
+func SetForegroundWindow(hwnd HWND) bool {
+	ret, _, _ := procSetForegroundWindow.Call(
+		uintptr(hwnd))
+
+	return ret != 0
+}
+
+// https://github.com/AllenDang/w32/pull/62/commits/bf59645b86663a54dffb94ca82683cc0610a6de3
+func FindWindowExW(hwndParent, hwndChildAfter HWND, className, windowName *uint16) HWND {
+	ret, _, _ := procFindWindowExW.Call(
+		uintptr(hwndParent),
+		uintptr(hwndChildAfter),
+		uintptr(unsafe.Pointer(className)),
+		uintptr(unsafe.Pointer(windowName)))
+
+	return HWND(ret)
+}
+
+// https://github.com/AllenDang/w32/pull/62/commits/bf59645b86663a54dffb94ca82683cc0610a6de3
+func FindWindowW(className, windowName *uint16) HWND {
+	ret, _, _ := procFindWindowW.Call(
+		uintptr(unsafe.Pointer(className)),
+		uintptr(unsafe.Pointer(windowName)))
+
+	return HWND(ret)
+}
+
+// https://github.com/AllenDang/w32/pull/62/commits/bf59645b86663a54dffb94ca82683cc0610a6de3
+func EnumChildWindows(hWndParent HWND, lpEnumFunc WNDENUMPROC, lParam LPARAM) bool {
+	ret, _, _ := procEnumChildWindows.Call(
+		uintptr(hWndParent),
+		uintptr(syscall.NewCallback(lpEnumFunc)),
+		uintptr(lParam),
+	)
+
+	return ret != 0
+}
 
 func GetWindowTextW(hwnd syscall.Handle, str *uint16, maxCount int32) (len int32, err error) {
 	r0, _, e1 := syscall.Syscall(procGetWindowTextW.Addr(), 3, uintptr(hwnd), uintptr(unsafe.Pointer(str)), uintptr(maxCount))

@@ -48,14 +48,15 @@ var (
 	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 	procSetConsoleCtrlHandler      = modkernel32.NewProc("SetConsoleCtrlHandler")
 
-	procVirtualAllocEx      = modkernel32.NewProc("VirtualAllocEx")
-	procVirtualAlloc        = modkernel32.NewProc("VirtualAlloc")
-	procGetProcAddress      = modkernel32.NewProc("GetProcAddress")
-	procCreateRemoteThread  = modkernel32.NewProc("CreateRemoteThread")
-	procLoadLibraryA        = modkernel32.NewProc("LoadLibraryA")
-	procCreateProcessA      = modkernel32.NewProc("CreateProcessA")
-)
+	procVirtualAllocEx     = modkernel32.NewProc("VirtualAllocEx")
+	procVirtualAlloc       = modkernel32.NewProc("VirtualAlloc")
+	procGetProcAddress     = modkernel32.NewProc("GetProcAddress")
+	procCreateRemoteThread = modkernel32.NewProc("CreateRemoteThread")
+	procLoadLibraryA       = modkernel32.NewProc("LoadLibraryA")
+	procCreateProcessA     = modkernel32.NewProc("CreateProcessA")
 
+	procVirtualFreeEx = modkernel32.NewProc("VirtualFreeEx")
+)
 
 func CreateProcessA(lpApplicationName *string,
 	lpCommandLine string,
@@ -111,6 +112,18 @@ func VirtualAlloc(lpAddress int, dwSize int, flAllocationType int, flProtect int
 		return ret, err
 	}
 	return ret, nil
+}
+
+// https://github.com/AllenDang/w32/pull/62/commits/08a52ff508c6b2b9b9bf5ee476109b903dcf219d
+func VirtualFreeEx(hProcess HANDLE, lpAddress, dwSize uintptr, dwFreeType uint32) bool {
+	ret, _, _ := procVirtualFreeEx.Call(
+		uintptr(hProcess),
+		lpAddress,
+		dwSize,
+		uintptr(dwFreeType),
+	)
+
+	return ret != 0
 }
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms683212(v=vs.85).aspx
