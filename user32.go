@@ -315,19 +315,14 @@ func PostQuitMessage(exitCode int) {
 		uintptr(exitCode))
 }
 
-func GetMessage(hwnd HWND, msgFilterMin, msgFilterMax uint32) (msg MSG, err error) {
-
-	_, _, err = procGetMessage.Call(
-		uintptr(unsafe.Pointer(&msg)),
+func GetMessage(msg *MSG, hwnd HWND, msgFilterMin, msgFilterMax uint32) int {
+	ret, _, _ := procGetMessage.Call(
+		uintptr(unsafe.Pointer(msg)),
 		uintptr(hwnd),
 		uintptr(msgFilterMin),
 		uintptr(msgFilterMax))
 
-	if err.Error() != ErrSuccess {
-		return
-	}
-	err = nil
-	return
+	return int(ret)
 }
 
 func TranslateMessage(msg *MSG) bool {
