@@ -1,5 +1,5 @@
 # Notes
-The original [repository](https://github.com/AllenDang/w32) appears to be abandoned. This mirror has some of my own additions plus updates from other forks of the original project. 
+The original [repository](https://github.com/AllenDang/w32) appear[s|ed] to be abandoned. This mirror has some of my own additions plus updates from other forks of the original project. I've attempted to document where I've pulled code from someone else. 
 
 ## Additional APIs compared to original repo:
 * GetWindowTextW
@@ -10,6 +10,8 @@ The original [repository](https://github.com/AllenDang/w32) appears to be abando
 * CreateRemoteThread
 * LoadLibraryA
 * CreateProcessA
+* SetWinEventHook
+* UnhookWinEvent
 
 About w32
 ==========
@@ -57,7 +59,7 @@ Setup
 
 1. [Install Go](https://golang.org/dl/). I recommend 32bit aka i386 due to GCC 64bit issues on windows.
 2. Get a GCC compiler. I recommend the [WinBuilds version](http://win-builds.org/doku.php/download_and_installation_from_windows).
-3. In command line, type `go get github.com/xackery/w32`
+3. In command line, type `go get github.com/JamesHovious/w32`
 4. Create a new file, and try the example above.
 
 Contribute
