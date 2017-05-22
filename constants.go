@@ -1370,6 +1370,7 @@ const (
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/dd318066(v=vs.85).aspx
 const (
+	WINEVENT_OUTOFCONTEXT         = 0x0000
 	EVENT_SYSTEM_SOUND            = 0x0001
 	EVENT_SYSTEM_ALERT            = 0x0002
 	EVENT_SYSTEM_FOREGROUND       = 0x0003

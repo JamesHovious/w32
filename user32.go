@@ -131,6 +131,8 @@ var (
 	procFindWindowExW       = moduser32.NewProc("FindWindowExW")
 	procGetClassName        = moduser32.NewProc("GetClassNameW")
 	procEnumChildWindows    = moduser32.NewProc("EnumChildWindows")
+	procSetWinEventHook     = moduser32.NewProc("SetWinEventHook")
+	procUnhookWinEvent      = moduser32.NewProc("UnhookWinEvent")
 )
 
 // https://github.com/AllenDang/w32/pull/62/commits/bf59645b86663a54dffb94ca82683cc0610a6de3
@@ -1095,6 +1097,28 @@ func SetWindowsHookEx(idHook int, lpfn HOOKPROC, hMod HINSTANCE, dwThreadId DWOR
 		uintptr(dwThreadId),
 	)
 	return HHOOK(ret)
+}
+
+// Lifted from https://github.com/kbinani/win/blob/b749091b14a8a4867e0fc93567d5c6af7b360e8f/user32.go#L5215
+func SetWinEventHook(eventMin DWORD, eventMax DWORD, hmodWinEventProc HMODULE, pfnWinEventProc HOOKPROC, idProcess DWORD, idThread DWORD, dwFlags DWORD) HHOOK {
+
+	ret, _, _ := procSetWinEventHook.Call(
+		uintptr(eventMin),
+		uintptr(eventMax),
+		uintptr(hmodWinEventProc),
+		uintptr(syscall.NewCallback(pfnWinEventProc)),
+		uintptr(idProcess),
+		uintptr(idThread),
+		uintptr(dwFlags),
+	)
+	return HHOOK(ret)
+}
+
+// Lifted from https://github.com/kbinani/win/blob/b749091b14a8a4867e0fc93567d5c6af7b360e8f/user32.go#L5548
+func UnhookWinEvent(hWinEventHook HHOOK) bool {
+	ret, _, _ := procUnhookWinEvent.Call(
+		uintptr(hWinEventHook))
+	return ret != 0
 }
 
 func UnhookWindowsHookEx(hhk HHOOK) bool {
