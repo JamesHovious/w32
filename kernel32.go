@@ -55,8 +55,29 @@ var (
 	procLoadLibraryA       = modkernel32.NewProc("LoadLibraryA")
 	procCreateProcessA     = modkernel32.NewProc("CreateProcessA")
 
-	procVirtualFreeEx = modkernel32.NewProc("VirtualFreeEx")
+	procVirtualFreeEx  = modkernel32.NewProc("VirtualFreeEx")
+	procVirtualProtect = modkernel32.NewProc("VirtualProtect")
+	procVirtualQuery   = modkernel32.NewProc("VirtualQuery")
 )
+
+// https://msdn.microsoft.com/en-us/library/windows/desktop/aa366902(v=vs.85).aspx
+func VirtualQuery(lpAddress int, lpBuffer int, dwLength int) int {
+	ret, _, _ := procVirtualQuery.Call(
+		uintptr(lpAddress),
+		uintptr(lpBuffer),
+		uintptr(dwLength))
+	return int(ret) // TODO check for errors
+}
+
+//https://msdn.microsoft.com/en-us/library/windows/desktop/aa366898(v=vs.85).aspx
+func VirtualProtect(lpAddress int, dwSize int, flNewProtect int, lpflOldProtect int) bool {
+	ret, _, _ := procVirtualProtect.Call(
+		uintptr(lpAddress),
+		uintptr(dwSize),
+		uintptr(flNewProtect),
+		uintptr(lpflOldProtect))
+	return ret != 0
+}
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682425(v=vs.85).aspx
 func CreateProcessA(lpApplicationName *string,
