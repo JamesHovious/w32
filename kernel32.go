@@ -70,12 +70,12 @@ func VirtualQuery(lpAddress uintptr, lpBuffer *MEMORY_BASIC_INFORMATION, dwLengt
 }
 
 //https://msdn.microsoft.com/en-us/library/windows/desktop/aa366898(v=vs.85).aspx
-func VirtualProtect(lpAddress uintptr, dwSize int, flNewProtect int, lpflOldProtect DWORD) bool {
+func VirtualProtect(lpAddress uintptr, dwSize int, flNewProtect int, lpflOldProtect *DWORD) bool {
 	ret, _, _ := procVirtualProtect.Call(
 		lpAddress,
 		uintptr(dwSize),
 		uintptr(flNewProtect),
-		uintptr(lpflOldProtect))
+		uintptr(unsafe.Pointer(lpflOldProtect)))
 	return ret != 0
 }
 

