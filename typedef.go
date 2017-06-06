@@ -216,6 +216,7 @@ type (
 	QPC_TIME        uint64
 	ULONG_PTR       uintptr
 	WPARAM          uintptr
+	SIZE_T          uintptr
 )
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/dd162805.aspx
@@ -919,3 +920,14 @@ type HOOKPROC func(int, WPARAM, LPARAM) LRESULT
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633498(v=vs.85).aspx
 type WNDENUMPROC func(HWND, LPARAM) LRESULT
+
+//https://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
+type MEMORY_BASIC_INFORMATION struct {
+	BaseAddress       PVOID
+	AllocationBase    PVOID
+	AllocationProtect DWORD
+	RegionSize        SIZE_T
+	State             DWORD
+	Protect           DWORD
+	Type              DWORD
+}
