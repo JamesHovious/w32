@@ -60,6 +60,7 @@ const (
 	MEM_RELEASE  = 0x8000
 )
 
+// https://msdn.microsoft.com/en-us/library/windows/desktop/aa366786(v=vs.85).aspx
 const (
 	PAGE_EXECUTE           = 0x10
 	PAGE_EXECUTE_READ      = 0x20
