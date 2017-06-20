@@ -58,11 +58,22 @@ var (
 	procVirtualFreeEx  = modkernel32.NewProc("VirtualFreeEx")
 	procVirtualProtect = modkernel32.NewProc("VirtualProtect")
 	procVirtualQuery   = modkernel32.NewProc("VirtualQuery")
+	procVirtualQueryEx = modkernel32.NewProc("VirtualQueryEx")
 )
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa366902(v=vs.85).aspx
 func VirtualQuery(lpAddress uintptr, lpBuffer *MEMORY_BASIC_INFORMATION, dwLength int) int {
 	ret, _, _ := procVirtualQuery.Call(
+		lpAddress,
+		uintptr(unsafe.Pointer(lpBuffer)),
+		uintptr(dwLength))
+	return int(ret) // TODO check for errors
+}
+
+// https://msdn.microsoft.com/en-us/library/windows/desktop/aa366907(v=vs.85).aspx
+func VirtualQueryEx(hProcess HANDLE, lpAddress uintptr, lpBuffer *MEMORY_BASIC_INFORMATION, dwLength int) int {
+	ret, _, _ := procVirtualQuery.Call(
+		uintptr(hProcess), // The handle to a process.
 		lpAddress,
 		uintptr(unsafe.Pointer(lpBuffer)),
 		uintptr(dwLength))
