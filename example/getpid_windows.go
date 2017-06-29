@@ -7,14 +7,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/JamesHovious/w32"
 	"syscall"
 	"unsafe"
 
+	"github.com/JamesHovious/w32"
 )
 
 func main() {
-	pid := GetPid("Explorer.EXE") // TODO make this case insensitive
+	pid := getPid("Explorer.EXE") // TODO make this case insensitive
 	fmt.Println(pid)
 }
 
@@ -23,7 +23,7 @@ func getModuleInfo(me32 *w32.MODULEENTRY32) string {
 	return procName
 }
 
-func isPid(process_name string, pid uint32) bool {
+func isPid(processName string, pid uint32) bool {
 	snap := w32.CreateToolhelp32Snapshot(w32.TH32CS_SNAPMODULE, pid)
 	if snap == 0 {
 		return false
@@ -35,11 +35,11 @@ func isPid(process_name string, pid uint32) bool {
 	if !w32.Module32First(snap, &me32) {
 		return false
 	}
-	if getModuleInfo(&me32) == process_name {
+	if getModuleInfo(&me32) == processName {
 		return true
 	} else {
 		for w32.Module32Next(snap, &me32) {
-			if getModuleInfo(&me32) == process_name {
+			if getModuleInfo(&me32) == processName {
 				return true
 			}
 		}
@@ -48,9 +48,9 @@ func isPid(process_name string, pid uint32) bool {
 
 }
 
-func GetPid(process_name string) (pid uint32) {
+func getPid(processName string) (pid uint32) {
 	ps := make([]uint32, 255)
-	var read uint32 = 0
+	var read uint32
 	if !w32.EnumProcesses(ps, uint32(len(ps)), &read) {
 		println("could not read processes")
 		return
@@ -60,7 +60,7 @@ func GetPid(process_name string) (pid uint32) {
 		if p == 0 {
 			continue
 		}
-		if isPid(process_name, p) {
+		if isPid(processName, p) {
 			pid = p
 			return pid
 		}
