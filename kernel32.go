@@ -72,7 +72,7 @@ func VirtualQuery(lpAddress uintptr, lpBuffer *MEMORY_BASIC_INFORMATION, dwLengt
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa366907(v=vs.85).aspx
 func VirtualQueryEx(hProcess HANDLE, lpAddress uintptr, lpBuffer *MEMORY_BASIC_INFORMATION, dwLength int) int {
-	ret, _, _ := procVirtualQuery.Call(
+	ret, _, _ := procVirtualQueryEx.Call(
 		uintptr(hProcess), // The handle to a process.
 		lpAddress,
 		uintptr(unsafe.Pointer(lpBuffer)),
