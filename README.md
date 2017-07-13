@@ -1,17 +1,7 @@
 # Notes
 The original [repository](https://github.com/AllenDang/w32) appear[s|ed] to be abandoned. This mirror has some of my own additions plus updates from other forks of the original project. I've attempted to document where I've pulled code from someone else. 
 
-## Additional APIs compared to original repo:
-* GetWindowTextW
-* GetForegroundWindow
-* VirtualAllocEx
-* VirtualAlloc
-* GetProcAddress
-* CreateRemoteThread
-* LoadLibraryA
-* CreateProcessA
-* SetWinEventHook
-* UnhookWinEvent
+This project currently has about a dozen or so extra win32 functions. I add them in myself when I have a use case, or if I see other forks of the same project and it is straightforward to add in their functions, I might integrate those chanes as well.
 
 About w32
 ==========
