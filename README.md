@@ -34,7 +34,7 @@ Example
 package main
 
 import (
-	"github.com/xackery/w32"
+	"github.com/JamesHovious/w32"
 )
 
 func main() {
