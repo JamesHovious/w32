@@ -12,55 +12,74 @@ import (
 var (
 	modgdi32 = syscall.NewLazyDLL("gdi32.dll")
 
-	procGetDeviceCaps             = modgdi32.NewProc("GetDeviceCaps")
-	procDeleteObject              = modgdi32.NewProc("DeleteObject")
-	procCreateFontIndirect        = modgdi32.NewProc("CreateFontIndirectW")
 	procAbortDoc                  = modgdi32.NewProc("AbortDoc")
 	procBitBlt                    = modgdi32.NewProc("BitBlt")
-	procPatBlt                    = modgdi32.NewProc("PatBlt")
+	procChoosePixelFormat         = modgdi32.NewProc("ChoosePixelFormat")
 	procCloseEnhMetaFile          = modgdi32.NewProc("CloseEnhMetaFile")
 	procCopyEnhMetaFile           = modgdi32.NewProc("CopyEnhMetaFileW")
 	procCreateBrushIndirect       = modgdi32.NewProc("CreateBrushIndirect")
+	procCreateCompatibleBitmap    = modgdi32.NewProc("CreateCompatibleBitmap")
 	procCreateCompatibleDC        = modgdi32.NewProc("CreateCompatibleDC")
 	procCreateDC                  = modgdi32.NewProc("CreateDCW")
 	procCreateDIBSection          = modgdi32.NewProc("CreateDIBSection")
 	procCreateEnhMetaFile         = modgdi32.NewProc("CreateEnhMetaFileW")
+	procCreateFontIndirect        = modgdi32.NewProc("CreateFontIndirectW")
 	procCreateIC                  = modgdi32.NewProc("CreateICW")
 	procDeleteDC                  = modgdi32.NewProc("DeleteDC")
 	procDeleteEnhMetaFile         = modgdi32.NewProc("DeleteEnhMetaFile")
+	procDeleteObject              = modgdi32.NewProc("DeleteObject")
+	procDescribePixelFormat       = modgdi32.NewProc("DescribePixelFormat")
 	procEllipse                   = modgdi32.NewProc("Ellipse")
 	procEndDoc                    = modgdi32.NewProc("EndDoc")
 	procEndPage                   = modgdi32.NewProc("EndPage")
 	procExtCreatePen              = modgdi32.NewProc("ExtCreatePen")
+	procGetCurrentObject          = modgdi32.NewProc("GetCurrentObject")
+	procGetDeviceCaps             = modgdi32.NewProc("GetDeviceCaps")
 	procGetEnhMetaFile            = modgdi32.NewProc("GetEnhMetaFileW")
 	procGetEnhMetaFileHeader      = modgdi32.NewProc("GetEnhMetaFileHeader")
+	procGetEnhMetaFilePixelFormat = modgdi32.NewProc("GetEnhMetaFilePixelFormat")
 	procGetObject                 = modgdi32.NewProc("GetObjectW")
+	procGetPixelFormat            = modgdi32.NewProc("GetPixelFormat")
 	procGetStockObject            = modgdi32.NewProc("GetStockObject")
 	procGetTextExtentExPoint      = modgdi32.NewProc("GetTextExtentExPointW")
 	procGetTextExtentPoint32      = modgdi32.NewProc("GetTextExtentPoint32W")
 	procGetTextMetrics            = modgdi32.NewProc("GetTextMetricsW")
 	procLineTo                    = modgdi32.NewProc("LineTo")
 	procMoveToEx                  = modgdi32.NewProc("MoveToEx")
+	procPatBlt                    = modgdi32.NewProc("PatBlt")
 	procPlayEnhMetaFile           = modgdi32.NewProc("PlayEnhMetaFile")
 	procRectangle                 = modgdi32.NewProc("Rectangle")
 	procResetDC                   = modgdi32.NewProc("ResetDCW")
 	procSelectObject              = modgdi32.NewProc("SelectObject")
+	procSetBkColor                = modgdi32.NewProc("SetBkColor")
 	procSetBkMode                 = modgdi32.NewProc("SetBkMode")
 	procSetBrushOrgEx             = modgdi32.NewProc("SetBrushOrgEx")
+	procSetDIBitsToDevice         = modgdi32.NewProc("SetDIBitsToDevice")
+	procSetPixelFormat            = modgdi32.NewProc("SetPixelFormat")
 	procSetStretchBltMode         = modgdi32.NewProc("SetStretchBltMode")
 	procSetTextColor              = modgdi32.NewProc("SetTextColor")
-	procSetBkColor                = modgdi32.NewProc("SetBkColor")
 	procStartDoc                  = modgdi32.NewProc("StartDocW")
 	procStartPage                 = modgdi32.NewProc("StartPage")
 	procStretchBlt                = modgdi32.NewProc("StretchBlt")
-	procSetDIBitsToDevice         = modgdi32.NewProc("SetDIBitsToDevice")
-	procChoosePixelFormat         = modgdi32.NewProc("ChoosePixelFormat")
-	procDescribePixelFormat       = modgdi32.NewProc("DescribePixelFormat")
-	procGetEnhMetaFilePixelFormat = modgdi32.NewProc("GetEnhMetaFilePixelFormat")
-	procGetPixelFormat            = modgdi32.NewProc("GetPixelFormat")
-	procSetPixelFormat            = modgdi32.NewProc("SetPixelFormat")
 	procSwapBuffers               = modgdi32.NewProc("SwapBuffers")
 )
+
+func CreateCompatibleBitmap(hdc HDC, width, height uint) HBITMAP {
+	ret, _, _ := procCreateCompatibleBitmap.Call(
+		uintptr(hdc),
+		uintptr(width),
+		uintptr(height))
+
+	return HBITMAP(ret)
+}
+
+func GetCurrentObject(hdc HDC, uObjectType uint32) HGDIOBJ {
+	ret, _, _ := procGetCurrentObject.Call(
+		uintptr(hdc),
+		uintptr(uObjectType))
+
+	return HGDIOBJ(ret)
+}
 
 func GetDeviceCaps(hdc HDC, index int) int {
 	ret, _, _ := procGetDeviceCaps.Call(

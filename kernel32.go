@@ -13,53 +13,146 @@ import (
 var (
 	modkernel32 = syscall.NewLazyDLL("kernel32.dll")
 
-	procGetModuleHandle            = modkernel32.NewProc("GetModuleHandleW")
-	procMulDiv                     = modkernel32.NewProc("MulDiv")
+	procCloseHandle                = modkernel32.NewProc("CloseHandle")
+	procCreateProcessA             = modkernel32.NewProc("CreateProcessA")
+	procCreateProcessW             = modkernel32.NewProc("CreateProcessW")
+	procCreateRemoteThread         = modkernel32.NewProc("CreateRemoteThread")
+	procCreateToolhelp32Snapshot   = modkernel32.NewProc("CreateToolhelp32Snapshot")
+	procFindResource               = modkernel32.NewProc("FindResourceW")
+	procGetConsoleScreenBufferInfo = modkernel32.NewProc("GetConsoleScreenBufferInfo")
 	procGetConsoleWindow           = modkernel32.NewProc("GetConsoleWindow")
 	procGetCurrentThread           = modkernel32.NewProc("GetCurrentThread")
+	procGetDiskFreeSpaceEx         = modkernel32.NewProc("GetDiskFreeSpaceExW")
+	procGetExitCodeProcess         = modkernel32.NewProc("GetExitCodeProcess")
+	procGetLastError               = modkernel32.NewProc("GetLastError")
 	procGetLogicalDrives           = modkernel32.NewProc("GetLogicalDrives")
+	procGetModuleHandle            = modkernel32.NewProc("GetModuleHandleW")
+	procGetProcAddress             = modkernel32.NewProc("GetProcAddress")
+	procGetProcessTimes            = modkernel32.NewProc("GetProcessTimes")
+	procGetSystemTime              = modkernel32.NewProc("GetSystemTime")
+	procGetSystemTimes             = modkernel32.NewProc("GetSystemTimes")
 	procGetUserDefaultLCID         = modkernel32.NewProc("GetUserDefaultLCID")
-	procLstrlen                    = modkernel32.NewProc("lstrlenW")
-	procLstrcpy                    = modkernel32.NewProc("lstrcpyW")
 	procGlobalAlloc                = modkernel32.NewProc("GlobalAlloc")
 	procGlobalFree                 = modkernel32.NewProc("GlobalFree")
 	procGlobalLock                 = modkernel32.NewProc("GlobalLock")
 	procGlobalUnlock               = modkernel32.NewProc("GlobalUnlock")
-	procMoveMemory                 = modkernel32.NewProc("RtlMoveMemory")
-	procFindResource               = modkernel32.NewProc("FindResourceW")
-	procSizeofResource             = modkernel32.NewProc("SizeofResource")
-	procLockResource               = modkernel32.NewProc("LockResource")
+	procLoadLibraryA               = modkernel32.NewProc("LoadLibraryA")
 	procLoadResource               = modkernel32.NewProc("LoadResource")
-	procGetLastError               = modkernel32.NewProc("GetLastError")
-	procOpenProcess                = modkernel32.NewProc("OpenProcess")
-	procTerminateProcess           = modkernel32.NewProc("TerminateProcess")
-	procCloseHandle                = modkernel32.NewProc("CloseHandle")
-	procCreateToolhelp32Snapshot   = modkernel32.NewProc("CreateToolhelp32Snapshot")
+	procLockResource               = modkernel32.NewProc("LockResource")
+	procLstrcpy                    = modkernel32.NewProc("lstrcpyW")
+	procLstrlen                    = modkernel32.NewProc("lstrlenW")
 	procModule32First              = modkernel32.NewProc("Module32FirstW")
 	procModule32Next               = modkernel32.NewProc("Module32NextW")
-	procGetSystemTimes             = modkernel32.NewProc("GetSystemTimes")
-	procGetConsoleScreenBufferInfo = modkernel32.NewProc("GetConsoleScreenBufferInfo")
-	procSetConsoleTextAttribute    = modkernel32.NewProc("SetConsoleTextAttribute")
-	procGetDiskFreeSpaceEx         = modkernel32.NewProc("GetDiskFreeSpaceExW")
-	procGetProcessTimes            = modkernel32.NewProc("GetProcessTimes")
-	procSetSystemTime              = modkernel32.NewProc("SetSystemTime")
-	procGetSystemTime              = modkernel32.NewProc("GetSystemTime")
+	procMoveMemory                 = modkernel32.NewProc("RtlMoveMemory")
+	procMulDiv                     = modkernel32.NewProc("MulDiv")
+	procOpenProcess                = modkernel32.NewProc("OpenProcess")
+	procQueryPerformanceCounter    = modkernel32.NewProc("QueryPerformanceCounter")
+	procQueryPerformanceFrequency  = modkernel32.NewProc("QueryPerformanceFrequency")
 	procReadProcessMemory          = modkernel32.NewProc("ReadProcessMemory")
-	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 	procSetConsoleCtrlHandler      = modkernel32.NewProc("SetConsoleCtrlHandler")
-
-	procVirtualAllocEx     = modkernel32.NewProc("VirtualAllocEx")
-	procVirtualAlloc       = modkernel32.NewProc("VirtualAlloc")
-	procGetProcAddress     = modkernel32.NewProc("GetProcAddress")
-	procCreateRemoteThread = modkernel32.NewProc("CreateRemoteThread")
-	procLoadLibraryA       = modkernel32.NewProc("LoadLibraryA")
-	procCreateProcessA     = modkernel32.NewProc("CreateProcessA")
-
-	procVirtualFreeEx  = modkernel32.NewProc("VirtualFreeEx")
-	procVirtualProtect = modkernel32.NewProc("VirtualProtect")
-	procVirtualQuery   = modkernel32.NewProc("VirtualQuery")
-	procVirtualQueryEx = modkernel32.NewProc("VirtualQueryEx")
+	procSetConsoleTextAttribute    = modkernel32.NewProc("SetConsoleTextAttribute")
+	procSetSystemTime              = modkernel32.NewProc("SetSystemTime")
+	procSizeofResource             = modkernel32.NewProc("SizeofResource")
+	procTerminateProcess           = modkernel32.NewProc("TerminateProcess")
+	procVirtualAlloc               = modkernel32.NewProc("VirtualAlloc")
+	procVirtualAllocEx             = modkernel32.NewProc("VirtualAllocEx")
+	procVirtualFreeEx              = modkernel32.NewProc("VirtualFreeEx")
+	procVirtualProtect             = modkernel32.NewProc("VirtualProtect")
+	procVirtualQuery               = modkernel32.NewProc("VirtualQuery")
+	procVirtualQueryEx             = modkernel32.NewProc("VirtualQueryEx")
+	procWaitForSingleObject        = modkernel32.NewProc("WaitForSingleObject")
+	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 )
+
+func GetExitCodeProcess(hProcess HANDLE) (code uintptr, e error) {
+	ret, _, lastErr := procGetExitCodeProcess.Call(
+		uintptr(hProcess),
+		uintptr(unsafe.Pointer(&code)),
+	)
+
+	if ret == 0 {
+		e = lastErr
+	}
+
+	return
+}
+
+// DWORD WINAPI WaitForSingleObject(
+//   _In_ HANDLE hHandle,
+//   _In_ DWORD  dwMilliseconds
+// );
+
+func WaitForSingleObject(hHandle HANDLE, msecs uint32) (ok bool, e error) {
+
+	ret, _, lastErr := procWaitForSingleObject.Call(
+		uintptr(hHandle),
+		uintptr(msecs),
+	)
+
+	if ret == WAIT_OBJECT_0 {
+		ok = true
+		return
+	}
+
+	// don't set e for timeouts, or it will be ERROR_SUCCESS which is
+	// confusing
+	if ret != WAIT_TIMEOUT {
+		e = lastErr
+	}
+	return
+
+}
+
+func CreateProcessW(
+	lpApplicationName, lpCommandLine string,
+	lpProcessAttributes, lpThreadAttributes *SECURITY_ATTRIBUTES,
+	bInheritHandles BOOL,
+	dwCreationFlags uint32,
+	lpEnvironment unsafe.Pointer,
+	lpCurrentDirectory string,
+	lpStartupInfo *STARTUPINFOW,
+	lpProcessInformation *PROCESS_INFORMATION,
+) (e error) {
+
+	var lpAN, lpCL, lpCD *uint16
+	if len(lpApplicationName) > 0 {
+		lpAN, e = syscall.UTF16PtrFromString(lpApplicationName)
+		if e != nil {
+			return
+		}
+	}
+	if len(lpCommandLine) > 0 {
+		lpCL, e = syscall.UTF16PtrFromString(lpCommandLine)
+		if e != nil {
+			return
+		}
+	}
+	if len(lpCurrentDirectory) > 0 {
+		lpCD, e = syscall.UTF16PtrFromString(lpCurrentDirectory)
+		if e != nil {
+			return
+		}
+	}
+
+	ret, _, lastErr := procCreateProcessW.Call(
+		uintptr(unsafe.Pointer(lpAN)),
+		uintptr(unsafe.Pointer(lpCL)),
+		uintptr(unsafe.Pointer(lpProcessAttributes)),
+		uintptr(unsafe.Pointer(lpProcessInformation)),
+		uintptr(bInheritHandles),
+		uintptr(dwCreationFlags),
+		uintptr(lpEnvironment),
+		uintptr(unsafe.Pointer(lpCD)),
+		uintptr(unsafe.Pointer(lpStartupInfo)),
+		uintptr(unsafe.Pointer(lpProcessInformation)),
+	)
+
+	if ret == 0 {
+		e = lastErr
+	}
+
+	return
+}
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa366902(v=vs.85).aspx
 func VirtualQuery(lpAddress uintptr, lpBuffer *MEMORY_BASIC_INFORMATION, dwLength int) int {
@@ -541,4 +634,22 @@ func SetConsoleCtrlHandler(handlerRoutine func(DWORD) int32, add uint) (err erro
 	}
 	err = nil
 	return
+}
+
+func QueryPerformanceCounter() uint64 {
+	result := uint64(0)
+	procQueryPerformanceCounter.Call(
+		uintptr(unsafe.Pointer(&result)),
+	)
+
+	return result
+}
+
+func QueryPerformanceFrequency() uint64 {
+	result := uint64(0)
+	procQueryPerformanceFrequency.Call(
+		uintptr(unsafe.Pointer(&result)),
+	)
+
+	return result
 }

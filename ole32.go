@@ -12,8 +12,8 @@ import (
 var (
 	modole32 = syscall.NewLazyDLL("ole32.dll")
 
-	procCoInitializeEx        = modole32.NewProc("CoInitializeEx")
 	procCoInitialize          = modole32.NewProc("CoInitialize")
+	procCoInitializeEx        = modole32.NewProc("CoInitializeEx")
 	procCoUninitialize        = modole32.NewProc("CoUninitialize")
 	procCreateStreamOnHGlobal = modole32.NewProc("CreateStreamOnHGlobal")
 )

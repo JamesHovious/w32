@@ -12,12 +12,12 @@ import (
 var (
 	modoleaut32 = syscall.NewLazyDLL("oleaut32")
 
-	procVariantInit        = modoleaut32.NewProc("VariantInit")
+	procCreateDispTypeInfo = modoleaut32.NewProc("CreateDispTypeInfo")
+	procCreateStdDispatch  = modoleaut32.NewProc("CreateStdDispatch")
 	procSysAllocString     = modoleaut32.NewProc("SysAllocString")
 	procSysFreeString      = modoleaut32.NewProc("SysFreeString")
 	procSysStringLen       = modoleaut32.NewProc("SysStringLen")
-	procCreateDispTypeInfo = modoleaut32.NewProc("CreateDispTypeInfo")
-	procCreateStdDispatch  = modoleaut32.NewProc("CreateStdDispatch")
+	procVariantInit        = modoleaut32.NewProc("VariantInit")
 )
 
 func VariantInit(v *VARIANT) {

@@ -12,9 +12,9 @@ import (
 var (
 	modcomdlg32 = syscall.NewLazyDLL("comdlg32.dll")
 
-	procGetSaveFileName      = modcomdlg32.NewProc("GetSaveFileNameW")
-	procGetOpenFileName      = modcomdlg32.NewProc("GetOpenFileNameW")
 	procCommDlgExtendedError = modcomdlg32.NewProc("CommDlgExtendedError")
+	procGetOpenFileName      = modcomdlg32.NewProc("GetOpenFileNameW")
+	procGetSaveFileName      = modcomdlg32.NewProc("GetSaveFileNameW")
 )
 
 func GetOpenFileName(ofn *OPENFILENAME) bool {

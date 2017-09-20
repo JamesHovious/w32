@@ -12,14 +12,14 @@ import (
 var (
 	modcomctl32 = syscall.NewLazyDLL("comctl32.dll")
 
-	procInitCommonControlsEx    = modcomctl32.NewProc("InitCommonControlsEx")
+	procImageList_Add           = modcomctl32.NewProc("ImageList_Add")
 	procImageList_Create        = modcomctl32.NewProc("ImageList_Create")
 	procImageList_Destroy       = modcomctl32.NewProc("ImageList_Destroy")
 	procImageList_GetImageCount = modcomctl32.NewProc("ImageList_GetImageCount")
-	procImageList_SetImageCount = modcomctl32.NewProc("ImageList_SetImageCount")
-	procImageList_Add           = modcomctl32.NewProc("ImageList_Add")
-	procImageList_ReplaceIcon   = modcomctl32.NewProc("ImageList_ReplaceIcon")
 	procImageList_Remove        = modcomctl32.NewProc("ImageList_Remove")
+	procImageList_ReplaceIcon   = modcomctl32.NewProc("ImageList_ReplaceIcon")
+	procImageList_SetImageCount = modcomctl32.NewProc("ImageList_SetImageCount")
+	procInitCommonControlsEx    = modcomctl32.NewProc("InitCommonControlsEx")
 	procTrackMouseEvent         = modcomctl32.NewProc("_TrackMouseEvent")
 )
 

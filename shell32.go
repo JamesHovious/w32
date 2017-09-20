@@ -14,14 +14,14 @@ import (
 var (
 	modshell32 = syscall.NewLazyDLL("shell32.dll")
 
-	procSHBrowseForFolder   = modshell32.NewProc("SHBrowseForFolderW")
-	procSHGetPathFromIDList = modshell32.NewProc("SHGetPathFromIDListW")
 	procDragAcceptFiles     = modshell32.NewProc("DragAcceptFiles")
+	procDragFinish          = modshell32.NewProc("DragFinish")
 	procDragQueryFile       = modshell32.NewProc("DragQueryFileW")
 	procDragQueryPoint      = modshell32.NewProc("DragQueryPoint")
-	procDragFinish          = modshell32.NewProc("DragFinish")
-	procShellExecute        = modshell32.NewProc("ShellExecuteW")
 	procExtractIcon         = modshell32.NewProc("ExtractIconW")
+	procSHBrowseForFolder   = modshell32.NewProc("SHBrowseForFolderW")
+	procSHGetPathFromIDList = modshell32.NewProc("SHGetPathFromIDListW")
+	procShellExecute        = modshell32.NewProc("ShellExecuteW")
 )
 
 func SHBrowseForFolder(bi *BROWSEINFO) uintptr {
