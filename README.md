@@ -8,7 +8,7 @@ It wraps win32 apis to "Go style" to make them easier to use.
 ## Notes
 This library was originally a clone of [AllenDang/w32](https://github.com/AllenDang/w32). At the time the repo appeared to be abandoned. Since I made this clone though the original repo picked up development again, but I decided to take this in a slightly different direction. 
 
-This library aims to mirror the win32 api, without additional functions or add-ons. It attempts to be as organized/documented as possible. 
+This library aims to mirror the win32 api and other Windows system dlls, without additional abstractions built on top of it. It attempts to be as organized/documented as possible. 
 
 This mirror has some of my own additions plus updates from other forks of the original project. I've attempted to document where I've pulled code from someone else. 
 
