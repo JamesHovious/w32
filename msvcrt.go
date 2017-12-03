@@ -8,6 +8,7 @@ var (
 	procStrLen = modmsvcrt.NewProc("strlen")
 )
 
+// https://msdn.microsoft.com/en-us/library/aa246468(v=vs.60).aspx
 func CopyMemory(dst uintptr, src uintptr, length int) {
 	procMemCpy.Call(dst, src, uintptr(uint32(length)))
 }
