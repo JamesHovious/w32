@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	modkernel32 = syscall.NewLazyDLL("kernel32.dll")
-
+	modkernel32                    = syscall.NewLazyDLL("kernel32.dll")
+	procCopyMemory                 = modkernel32.NewProc("RtlCopyMemory")
 	procCloseHandle                = modkernel32.NewProc("CloseHandle")
 	procCreateProcessA             = modkernel32.NewProc("CreateProcessA")
 	procCreateProcessW             = modkernel32.NewProc("CreateProcessW")
@@ -63,6 +63,7 @@ var (
 	procWaitForSingleObject        = modkernel32.NewProc("WaitForSingleObject")
 	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 )
+
 
 func GetExitCodeProcess(hProcess HANDLE) (code uintptr, e error) {
 	ret, _, lastErr := procGetExitCodeProcess.Call(
