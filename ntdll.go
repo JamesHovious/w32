@@ -21,7 +21,23 @@ var (
 	procNtAlpcDisconnectPort             = modntdll.NewProc("NtAlpcDisconnectPort")
 	procNtAlpcSendWaitReceivePort        = modntdll.NewProc("NtAlpcSendWaitReceivePort")
 	procRtlCreateUnicodeStringFromAsciiz = modntdll.NewProc("RtlCreateUnicodeStringFromAsciiz") // TODO
+	procZwAllocateVirtualMemory          = modntdll.NewProc("ZwAllocateVirtualMemory")
 )
+
+// https://msdn.microsoft.com/en-us/library/windows/hardware/ff566416(v=vs.85).aspx
+func ZwAllocateVirtualMemory(hProcess HANDLE, lpAddress int, zeroBits int, reSize int, flAllocationType int, flProtect int) (err error) {
+	ret, _, err := procVirtualAllocEx.Call(
+		uintptr(hProcess),
+		uintptr(lpAddress),
+		uintptr(zeroBits),
+		uintptr(reSize),
+		uintptr(flAllocationType),
+		uintptr(flProtect))
+	if int(ret) == 0 {
+		return nil
+	}
+	return err
+}
 
 func NtAlpcCreatePort(pObjectAttributes *OBJECT_ATTRIBUTES, pPortAttributes *ALPC_PORT_ATTRIBUTES) (hPort HANDLE, e error) {
 
