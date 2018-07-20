@@ -64,7 +64,6 @@ var (
 	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 )
 
-
 func GetExitCodeProcess(hProcess HANDLE) (code uintptr, e error) {
 	ret, _, lastErr := procGetExitCodeProcess.Call(
 		uintptr(hProcess),
@@ -451,7 +450,7 @@ func OpenProcess(desiredAccess uint32, inheritHandle bool, processId uint32) (ha
 		uintptr(desiredAccess),
 		uintptr(inherit),
 		uintptr(processId))
-	if err != nil && err.Error() == "The operation completed successfully." {
+	if err != nil && IsErrSuccess(err) {
 		err = nil
 	}
 	handle = HANDLE(ret)
@@ -551,7 +550,7 @@ func GetDiskFreeSpaceEx(dirName string) (r bool,
 func GetSystemTime() (time SYSTEMTIME, err error) {
 	_, _, err = procGetSystemTime.Call(
 		uintptr(unsafe.Pointer(&time)))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
@@ -561,7 +560,7 @@ func GetSystemTime() (time SYSTEMTIME, err error) {
 func SetSystemTime(time *SYSTEMTIME) (err error) {
 	_, _, err = procSetSystemTime.Call(
 		uintptr(unsafe.Pointer(time)))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
@@ -578,7 +577,7 @@ func WriteProcessMemory(hProcess HANDLE, lpBaseAddress uint32, data []byte, size
 		uintptr(unsafe.Pointer(&data[0])),
 		uintptr(size),
 		uintptr(unsafe.Pointer(&numBytesRead)))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
@@ -608,14 +607,14 @@ func ReadProcessMemory(hProcess HANDLE, lpBaseAddress uint32, size uint) (data [
 		uintptr(unsafe.Pointer(&data[0])),
 		uintptr(size),
 		uintptr(unsafe.Pointer(&numBytesRead)))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
 	return
 }
 
-//Read process memory and convert the returned data to uint32
+// Read process memory and convert the returned data to uint32
 func ReadProcessMemoryAsUint32(hProcess HANDLE, lpBaseAddress uint32) (buffer uint32, err error) {
 	data, err := ReadProcessMemory(hProcess, lpBaseAddress, 4)
 	if err != nil {
@@ -630,7 +629,7 @@ func ReadProcessMemoryAsUint32(hProcess HANDLE, lpBaseAddress uint32) (buffer ui
 func SetConsoleCtrlHandler(handlerRoutine func(DWORD) int32, add uint) (err error) {
 	_, _, err = procSetConsoleCtrlHandler.Call(uintptr(unsafe.Pointer(&handlerRoutine)),
 		uintptr(add))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
