@@ -31,6 +31,7 @@ var (
 	procGetProcessTimes            = modkernel32.NewProc("GetProcessTimes")
 	procGetSystemTime              = modkernel32.NewProc("GetSystemTime")
 	procGetSystemTimes             = modkernel32.NewProc("GetSystemTimes")
+	procGetSystemInfo              = modkernel32.NewProc("GetSystemInfo")
 	procGetUserDefaultLCID         = modkernel32.NewProc("GetUserDefaultLCID")
 	procGlobalAlloc                = modkernel32.NewProc("GlobalAlloc")
 	procGlobalFree                 = modkernel32.NewProc("GlobalFree")
@@ -505,6 +506,12 @@ func GetSystemTimes(lpIdleTime, lpKernelTime, lpUserTime *FILETIME) bool {
 		uintptr(unsafe.Pointer(lpUserTime)))
 
 	return ret != 0
+}
+
+// GetSystemInfo retrieves information about the current system.
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms724381(v=vs.85).aspx
+func GetSystemInfo(sysinfo *SYSTEM_INFO) {
+	procGetSystemInfo.Call(uintptr(unsafe.Pointer(sysinfo)))
 }
 
 func GetProcessTimes(hProcess HANDLE, lpCreationTime, lpExitTime, lpKernelTime, lpUserTime *FILETIME) bool {

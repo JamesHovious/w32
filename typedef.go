@@ -1266,3 +1266,19 @@ type SECURITY_ATTRIBUTES struct {
 	SecurityDescriptor uintptr
 	InheritHandle      BOOL
 }
+
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms724958(v=vs.85).aspx
+type SYSTEM_INFO struct {
+	OemID                     DWORD
+	ProcessorArchitecture     uint16
+	Reserved                  uint16
+	PageSize                  DWORD
+	MinimumApplicationAddress unsafe.Pointer
+	MaximumApplicationAddress unsafe.Pointer
+	ActiveProcessorMask       ULONG_PTR
+	NumberOfProcessors        DWORD
+	ProcessorType             DWORD
+	AllocationGranularity     DWORD
+	ProcessorLevel            uint16
+	ProcessorRevision         uint16
+}
