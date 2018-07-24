@@ -679,6 +679,20 @@ type MODULEENTRY32 struct {
 	SzExePath    [MAX_PATH]uint16
 }
 
+// https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/ns-tlhelp32-tagprocessentry32
+type PROCESSENTRY32 struct {
+	Size            uint32
+	CntUsage        uint32
+	ProcessID       uint32
+	DefaultHeapID   ULONG_PTR
+	ModuleID        uint32
+	Threads         uint32
+	ParentProcessID uint32
+	PriClassBase    int32
+	Flags           uint32
+	ExeFile         [MAX_PATH]uint16
+}
+
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms724284.aspx
 type FILETIME struct {
 	DwLowDateTime  uint32

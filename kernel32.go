@@ -42,6 +42,8 @@ var (
 	procLockResource               = modkernel32.NewProc("LockResource")
 	procLstrcpy                    = modkernel32.NewProc("lstrcpyW")
 	procLstrlen                    = modkernel32.NewProc("lstrlenW")
+	procProcess32First             = modkernel32.NewProc("Process32FirstW")
+	procProcess32Next              = modkernel32.NewProc("Process32NextW")
 	procModule32First              = modkernel32.NewProc("Module32FirstW")
 	procModule32Next               = modkernel32.NewProc("Module32NextW")
 	procMoveMemory                 = modkernel32.NewProc("RtlMoveMemory")
@@ -481,6 +483,22 @@ func CreateToolhelp32Snapshot(flags, processId uint32) HANDLE {
 	}
 
 	return HANDLE(ret)
+}
+
+func Process32First(snapshot HANDLE, pe *PROCESSENTRY32) bool {
+	ret, _, _ := procProcess32First.Call(
+		uintptr(snapshot),
+		uintptr(unsafe.Pointer(pe)))
+
+	return ret != 0
+}
+
+func Process32Next(snapshot HANDLE, pe *PROCESSENTRY32) bool {
+	ret, _, _ := procProcess32Next.Call(
+		uintptr(snapshot),
+		uintptr(unsafe.Pointer(pe)))
+
+	return ret != 0
 }
 
 func Module32First(snapshot HANDLE, me *MODULEENTRY32) bool {
