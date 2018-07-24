@@ -1269,7 +1269,7 @@ type SECURITY_ATTRIBUTES struct {
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms724958(v=vs.85).aspx
 type SYSTEM_INFO struct {
-	OemID                     DWORD
+	// OemID                     DWORD union with ProcessorArchitecture & Reserved
 	ProcessorArchitecture     uint16
 	Reserved                  uint16
 	PageSize                  DWORD
