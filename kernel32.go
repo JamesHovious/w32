@@ -487,7 +487,7 @@ func CreateToolhelp32Snapshot(flags, processId uint32) HANDLE {
 
 func Process32First(snapshot HANDLE, pe *PROCESSENTRY32) bool {
 	if pe.Size == 0 {
-		pe.Size = unsafe.Sizeof(*pe)
+		pe.Size = uint32(unsafe.Sizeof(*pe))
 	}
 	ret, _, _ := procProcess32First.Call(
 		uintptr(snapshot),
@@ -498,7 +498,7 @@ func Process32First(snapshot HANDLE, pe *PROCESSENTRY32) bool {
 
 func Process32Next(snapshot HANDLE, pe *PROCESSENTRY32) bool {
 	if pe.Size == 0 {
-		pe.Size = unsafe.Sizeof(*pe)
+		pe.Size = uint32(unsafe.Sizeof(*pe))
 	}
 	ret, _, _ := procProcess32Next.Call(
 		uintptr(snapshot),
