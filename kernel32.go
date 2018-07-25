@@ -31,6 +31,7 @@ var (
 	procGetProcessTimes            = modkernel32.NewProc("GetProcessTimes")
 	procGetSystemTime              = modkernel32.NewProc("GetSystemTime")
 	procGetSystemTimes             = modkernel32.NewProc("GetSystemTimes")
+	procGetSystemInfo              = modkernel32.NewProc("GetSystemInfo")
 	procGetUserDefaultLCID         = modkernel32.NewProc("GetUserDefaultLCID")
 	procGlobalAlloc                = modkernel32.NewProc("GlobalAlloc")
 	procGlobalFree                 = modkernel32.NewProc("GlobalFree")
@@ -41,6 +42,8 @@ var (
 	procLockResource               = modkernel32.NewProc("LockResource")
 	procLstrcpy                    = modkernel32.NewProc("lstrcpyW")
 	procLstrlen                    = modkernel32.NewProc("lstrlenW")
+	procProcess32First             = modkernel32.NewProc("Process32FirstW")
+	procProcess32Next              = modkernel32.NewProc("Process32NextW")
 	procModule32First              = modkernel32.NewProc("Module32FirstW")
 	procModule32Next               = modkernel32.NewProc("Module32NextW")
 	procMoveMemory                 = modkernel32.NewProc("RtlMoveMemory")
@@ -63,7 +66,6 @@ var (
 	procWaitForSingleObject        = modkernel32.NewProc("WaitForSingleObject")
 	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 )
-
 
 func GetExitCodeProcess(hProcess HANDLE) (code uintptr, e error) {
 	ret, _, lastErr := procGetExitCodeProcess.Call(
@@ -451,7 +453,7 @@ func OpenProcess(desiredAccess uint32, inheritHandle bool, processId uint32) (ha
 		uintptr(desiredAccess),
 		uintptr(inherit),
 		uintptr(processId))
-	if err != nil && err.Error() == "The operation completed successfully." {
+	if err != nil && IsErrSuccess(err) {
 		err = nil
 	}
 	handle = HANDLE(ret)
@@ -483,6 +485,28 @@ func CreateToolhelp32Snapshot(flags, processId uint32) HANDLE {
 	return HANDLE(ret)
 }
 
+func Process32First(snapshot HANDLE, pe *PROCESSENTRY32) bool {
+	if pe.Size == 0 {
+		pe.Size = uint32(unsafe.Sizeof(*pe))
+	}
+	ret, _, _ := procProcess32First.Call(
+		uintptr(snapshot),
+		uintptr(unsafe.Pointer(pe)))
+
+	return ret != 0
+}
+
+func Process32Next(snapshot HANDLE, pe *PROCESSENTRY32) bool {
+	if pe.Size == 0 {
+		pe.Size = uint32(unsafe.Sizeof(*pe))
+	}
+	ret, _, _ := procProcess32Next.Call(
+		uintptr(snapshot),
+		uintptr(unsafe.Pointer(pe)))
+
+	return ret != 0
+}
+
 func Module32First(snapshot HANDLE, me *MODULEENTRY32) bool {
 	ret, _, _ := procModule32First.Call(
 		uintptr(snapshot),
@@ -506,6 +530,12 @@ func GetSystemTimes(lpIdleTime, lpKernelTime, lpUserTime *FILETIME) bool {
 		uintptr(unsafe.Pointer(lpUserTime)))
 
 	return ret != 0
+}
+
+// GetSystemInfo retrieves information about the current system.
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms724381(v=vs.85).aspx
+func GetSystemInfo(sysinfo *SYSTEM_INFO) {
+	procGetSystemInfo.Call(uintptr(unsafe.Pointer(sysinfo)))
 }
 
 func GetProcessTimes(hProcess HANDLE, lpCreationTime, lpExitTime, lpKernelTime, lpUserTime *FILETIME) bool {
@@ -551,7 +581,7 @@ func GetDiskFreeSpaceEx(dirName string) (r bool,
 func GetSystemTime() (time SYSTEMTIME, err error) {
 	_, _, err = procGetSystemTime.Call(
 		uintptr(unsafe.Pointer(&time)))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
@@ -561,7 +591,7 @@ func GetSystemTime() (time SYSTEMTIME, err error) {
 func SetSystemTime(time *SYSTEMTIME) (err error) {
 	_, _, err = procSetSystemTime.Call(
 		uintptr(unsafe.Pointer(time)))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
@@ -578,7 +608,7 @@ func WriteProcessMemory(hProcess HANDLE, lpBaseAddress uint32, data []byte, size
 		uintptr(unsafe.Pointer(&data[0])),
 		uintptr(size),
 		uintptr(unsafe.Pointer(&numBytesRead)))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
@@ -608,14 +638,14 @@ func ReadProcessMemory(hProcess HANDLE, lpBaseAddress uint32, size uint) (data [
 		uintptr(unsafe.Pointer(&data[0])),
 		uintptr(size),
 		uintptr(unsafe.Pointer(&numBytesRead)))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
 	return
 }
 
-//Read process memory and convert the returned data to uint32
+// Read process memory and convert the returned data to uint32
 func ReadProcessMemoryAsUint32(hProcess HANDLE, lpBaseAddress uint32) (buffer uint32, err error) {
 	data, err := ReadProcessMemory(hProcess, lpBaseAddress, 4)
 	if err != nil {
@@ -630,7 +660,7 @@ func ReadProcessMemoryAsUint32(hProcess HANDLE, lpBaseAddress uint32) (buffer ui
 func SetConsoleCtrlHandler(handlerRoutine func(DWORD) int32, add uint) (err error) {
 	_, _, err = procSetConsoleCtrlHandler.Call(uintptr(unsafe.Pointer(&handlerRoutine)),
 		uintptr(add))
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
