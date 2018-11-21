@@ -106,7 +106,7 @@ var (
 	procScreenToClient                = moduser32.NewProc("ScreenToClient")
 	procSendInput                     = moduser32.NewProc("SendInput")
 	procSendMessage                   = moduser32.NewProc("SendMessageW")
-	procSendMessageTimeout            = moduser32.NewProc("SendMessageTimeout")
+	procSendMessageTimeout            = moduser32.NewProc("SendMessageTimeoutW")
 	procSetCapture                    = moduser32.NewProc("SetCapture")
 	procSetClipboardData              = moduser32.NewProc("SetClipboardData")
 	procSetCursor                     = moduser32.NewProc("SetCursor")
@@ -136,14 +136,15 @@ var (
 	procWaitMessage                   = moduser32.NewProc("WaitMessage")
 )
 
-func SendMessageTimeout(hwnd HWND, msg uint32, wParam, lParam uintptr, fuFlags, uTimeout uint32) uintptr {
+func SendMessageTimeout(hwnd HWND, msg uint32, wParam, lParam uintptr, fuFlags, uTimeout uint32, lpdwResult uintptr) uintptr {
 	ret, _, _ := procSendMessageTimeout.Call(
 		uintptr(hwnd),
 		uintptr(msg),
 		wParam,
 		lParam,
 		uintptr(fuFlags),
-		uintptr(uTimeout))
+		uintptr(uTimeout),
+		lpdwResult)
 
 	return ret
 }
