@@ -679,6 +679,20 @@ type MODULEENTRY32 struct {
 	SzExePath    [MAX_PATH]uint16
 }
 
+// https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/ns-tlhelp32-tagprocessentry32
+type PROCESSENTRY32 struct {
+	Size            uint32
+	CntUsage        uint32
+	ProcessID       uint32
+	DefaultHeapID   ULONG_PTR
+	ModuleID        uint32
+	Threads         uint32
+	ParentProcessID uint32
+	PriClassBase    int32
+	Flags           uint32
+	ExeFile         [MAX_PATH]uint16
+}
+
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ms724284.aspx
 type FILETIME struct {
 	DwLowDateTime  uint32
@@ -1265,4 +1279,20 @@ type SECURITY_ATTRIBUTES struct {
 	Length             uint32
 	SecurityDescriptor uintptr
 	InheritHandle      BOOL
+}
+
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ms724958(v=vs.85).aspx
+type SYSTEM_INFO struct {
+	// OemID                     DWORD union with ProcessorArchitecture & Reserved
+	ProcessorArchitecture     uint16
+	Reserved                  uint16
+	PageSize                  DWORD
+	MinimumApplicationAddress unsafe.Pointer
+	MaximumApplicationAddress unsafe.Pointer
+	ActiveProcessorMask       ULONG_PTR
+	NumberOfProcessors        DWORD
+	ProcessorType             DWORD
+	AllocationGranularity     DWORD
+	ProcessorLevel            uint16
+	ProcessorRevision         uint16
 }

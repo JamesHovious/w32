@@ -762,7 +762,7 @@ func PeekMessage(hwnd HWND, wMsgFilterMin, wMsgFilterMax, wRemoveMsg uint32) (ms
 		uintptr(wMsgFilterMax),
 		uintptr(wRemoveMsg))
 
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
@@ -1064,7 +1064,7 @@ func SendInput(inputs []INPUT) (err error) {
 		uintptr(unsafe.Pointer(&validInputs[0])),
 		uintptr(unsafe.Sizeof(C.INPUT{})),
 	)
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
@@ -1160,7 +1160,7 @@ func RegisterHotKey(hwnd HWND, id int, fsModifiers uint, vkey uint) (err error) 
 		uintptr(fsModifiers),
 		uintptr(vkey),
 	)
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
@@ -1174,7 +1174,7 @@ func UnregisterHotKey(hwnd HWND, id int) (err error) {
 		uintptr(hwnd),
 		uintptr(id),
 	)
-	if err.Error() != ErrSuccess {
+	if !IsErrSuccess(err) {
 		return
 	}
 	err = nil
