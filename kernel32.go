@@ -65,7 +65,38 @@ var (
 	procVirtualQueryEx             = modkernel32.NewProc("VirtualQueryEx")
 	procWaitForSingleObject        = modkernel32.NewProc("WaitForSingleObject")
 	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
+
+	procResumeThread  = modkernel32.NewProc("ResumeThread")
+	procSuspendThread = modkernel32.NewProc("SuspendThread")
 )
+
+// DWORD SuspendThread(
+// 	HANDLE hThread
+// );
+
+func SuspendThread(hThread HANDLE) (count int, e error) {
+	ret, _, lastErr := procSuspendThread.Call()
+	if ret == 0xffffffff {
+		e = lastErr
+		return
+	}
+
+	return int(ret), nil
+}
+
+// DWORD ResumeThread(
+// 	HANDLE hThread
+// );
+
+func ResumeThread(hThread HANDLE) (count int, e error) {
+	ret, _, lastErr := procResumeThread.Call()
+	if ret == 0xffffffff {
+		e = lastErr
+		return
+	}
+
+	return int(ret), nil
+}
 
 func GetExitCodeProcess(hProcess HANDLE) (code uintptr, e error) {
 	ret, _, lastErr := procGetExitCodeProcess.Call(
