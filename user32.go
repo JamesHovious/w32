@@ -133,6 +133,8 @@ var (
 	procUnionRect                     = moduser32.NewProc("UnionRect")
 	procUnregisterHotKey              = moduser32.NewProc("UnregisterHotKey")
 	procUpdateWindow                  = moduser32.NewProc("UpdateWindow")
+	procVkKeyScanW                    = moduser32.NewProc("VkKeyScanW")
+	procVkKeyScanExW                  = moduser32.NewProc("VkKeyScanExW")
 	procWaitMessage                   = moduser32.NewProc("WaitMessage")
 )
 
@@ -1180,4 +1182,23 @@ func UnregisterHotKey(hwnd HWND, id int) (err error) {
 	}
 	err = nil
 	return
+}
+
+// Translates a character to the corresponding virtual-key code and shift state for the current keyboard.
+// See https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-vkkeyscanw
+func VkKeyScanW(char uint16) int16 {
+	ret, _, _ := procVkKeyScanW.Call(
+		uintptr(char),
+	)
+	return int16(ret)
+}
+
+// Translates a character to the corresponding virtual-key code and shift state.
+//See https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-vkkeyscanexw
+func VkKeyScanExW(char uint16, hkl HKL) int16 {
+	ret, _, _ := procVkKeyScanExW.Call(
+		uintptr(char),
+		uintptr(hkl),
+	)
+	return int16(ret)
 }
