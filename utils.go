@@ -24,6 +24,14 @@ func HIWORD(dw uint32) uint16 {
 	return uint16(dw >> 16 & 0xffff)
 }
 
+func LOBYTE(word uint16) uint8 {
+	return uint8(word)
+}
+
+func HIBYTE(word uint16) uint8 {
+	return uint8(word >> 8 & 0xff)
+}
+
 func BoolToBOOL(value bool) BOOL {
 	if value {
 		return 1
