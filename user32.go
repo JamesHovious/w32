@@ -179,6 +179,18 @@ func FindWindowExW(hwndParent, hwndChildAfter HWND, className, windowName *uint1
 	return HWND(ret)
 }
 
+func FindWindowExS(hwndParent, hwndChildAfter HWND, className, windowName *string) HWND {
+	var class *uint16 = nil
+	if className != nil {
+		class = syscall.StringToUTF16Ptr(*className)
+	}
+	var window *uint16 = nil
+	if windowName != nil {
+		window = syscall.StringToUTF16Ptr(*windowName)
+	}
+	return FindWindowExW(hwndParent, hwndChildAfter, class, window)
+}
+
 // https://github.com/AllenDang/w32/pull/62/commits/bf59645b86663a54dffb94ca82683cc0610a6de3
 func FindWindowW(className, windowName *uint16) HWND {
 	ret, _, _ := procFindWindowW.Call(
@@ -186,6 +198,18 @@ func FindWindowW(className, windowName *uint16) HWND {
 		uintptr(unsafe.Pointer(windowName)))
 
 	return HWND(ret)
+}
+
+func FindWindowS(className, windowName *string) HWND {
+	var class *uint16 = nil
+	if className != nil {
+		class = syscall.StringToUTF16Ptr(*className)
+	}
+	var window *uint16 = nil
+	if windowName != nil {
+		window = syscall.StringToUTF16Ptr(*windowName)
+	}
+	return FindWindowW(class, window)
 }
 
 // https://github.com/AllenDang/w32/pull/62/commits/bf59645b86663a54dffb94ca82683cc0610a6de3
@@ -236,6 +260,14 @@ func LoadIcon(instance HINSTANCE, iconName *uint16) HICON {
 
 }
 
+func LoadIconS(instance HINSTANCE, iconName *string) HICON {
+	var icon *uint16 = nil
+	if iconName != nil {
+		icon = syscall.StringToUTF16Ptr(*iconName)
+	}
+	return LoadIcon(instance, icon)
+}
+
 func LoadCursor(instance HINSTANCE, cursorName *uint16) HCURSOR {
 	ret, _, _ := procLoadCursor.Call(
 		uintptr(instance),
@@ -243,6 +275,14 @@ func LoadCursor(instance HINSTANCE, cursorName *uint16) HCURSOR {
 
 	return HCURSOR(ret)
 
+}
+
+func LoadCursorS(instance HINSTANCE, cursorName *string) HCURSOR {
+	var cursor *uint16 = nil
+	if cursorName != nil {
+		cursor = syscall.StringToUTF16Ptr(*cursorName)
+	}
+	return LoadCursor(instance, cursor)
 }
 
 func ShowWindow(hwnd HWND, cmdshow int) bool {
@@ -278,6 +318,33 @@ func CreateWindowEx(exStyle uint, className, windowName *uint16,
 		uintptr(param))
 
 	return HWND(ret)
+}
+
+func CreateWindowExS(exStyle uint, className, windowName *string,
+	style uint, x, y, width, height int, parent HWND, menu HMENU,
+	instance HINSTANCE, param unsafe.Pointer) HWND {
+	var class *uint16 = nil
+	if className != nil {
+		class = syscall.StringToUTF16Ptr(*className)
+	}
+	var window *uint16 = nil
+	if windowName != nil {
+		window = syscall.StringToUTF16Ptr(*windowName)
+	}
+	return CreateWindowEx(
+		exStyle,
+		class,
+		window,
+		style,
+		x,
+		y,
+		width,
+		height,
+		parent,
+		menu,
+		instance,
+		param,
+	)
 }
 
 func AdjustWindowRectEx(rect *RECT, style uint, menu bool, exStyle uint) bool {
