@@ -221,6 +221,53 @@ type (
 	WPARAM          uintptr
 )
 
+type PMINIDUMP_EXCEPTION_INFORMATION struct {
+	ThreadId          DWORD
+	ExceptionPointers PEXCEPTION_POINTERS // TODO get right data type here
+	ClientPointers    BOOL
+}
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/minidumpapiset/ns-minidumpapiset-minidump_user_stream_information
+type MINIDUMP_USER_STREAM_INFORMATION struct {
+	UserStreamCount ULONG
+	UserStreamArray PMINIDUMP_USER_STREAM // TODO get right data type here
+}
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/minidumpapiset/ns-minidumpapiset-minidump_callback_information
+type MINIDUMP_CALLBACK_INFORMATION struct {
+	CallbackRoutine MINIDUMP_CALLBACK_ROUTINE // TODO get right data type here
+	CallbackParam   PVOID
+}
+
+// https://docs.microsoft.com/en-us/windows/desktop/api/minidumpapiset/ne-minidumpapiset-_minidump_type
+type MINIDUMP_TYPE struct {
+	MiniDumpNormal                         uintptr // TODO get right data type here
+	MiniDumpWithDataSegs                   uintptr // TODO get right data type here
+	MiniDumpWithFullMemory                 uintptr // TODO get right data type here
+	MiniDumpWithHandleData                 uintptr // TODO get right data type here
+	MiniDumpFilterMemory                   uintptr // TODO get right data type here
+	MiniDumpScanMemory                     uintptr // TODO get right data type here
+	MiniDumpWithUnloadedModules            uintptr // TODO get right data type here
+	MiniDumpWithIndirectlyReferencedMemory uintptr // TODO get right data type here
+	MiniDumpFilterModulePaths              uintptr // TODO get right data type here
+	MiniDumpWithProcessThreadData          uintptr // TODO get right data type here
+	MiniDumpWithPrivateReadWriteMemory     uintptr // TODO get right data type here
+	MiniDumpWithoutOptionalData            uintptr // TODO get right data type here
+	MiniDumpWithFullMemoryInfo             uintptr // TODO get right data type here
+	MiniDumpWithThreadInfo                 uintptr // TODO get right data type here
+	MiniDumpWithCodeSegs                   uintptr // TODO get right data type here
+	MiniDumpWithoutAuxiliaryState          uintptr // TODO get right data type here
+	MiniDumpWithFullAuxiliaryState         uintptr // TODO get right data type here
+	MiniDumpWithPrivateWriteCopyMemory     uintptr // TODO get right data type here
+	MiniDumpIgnoreInaccessibleMemory       uintptr // TODO get right data type here
+	MiniDumpWithTokenInformation           uintptr // TODO get right data type here
+	MiniDumpWithModuleHeaders              uintptr // TODO get right data type here
+	MiniDumpFilterTriage                   uintptr // TODO get right data type here
+	MiniDumpWithAvxXStateContextuintptr    uintptr // TODO get right data type here
+	MiniDumpWithIptTrace                   uintptr // TODO get right data type here
+	MiniDumpValidTypeFlags                 uintptr // TODO get right data type here
+}
+
 // http://msdn.microsoft.com/en-us/library/windows/desktop/dd162805.aspx
 type POINT struct {
 	X, Y int32
