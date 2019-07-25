@@ -3026,3 +3026,25 @@ const (
 	ALPC_SYNC_OBJECT_TYPE   uint32 = 2
 	ALPC_THREAD_OBJECT_TYPE uint32 = 4
 )
+
+// Device scale factor
+// https://docs.microsoft.com/zh-cn/windows/win32/api/shtypes/ne-shtypes-device_scale_factor
+const (
+	DEVICE_SCALE_FACTOR_INVALID = 0
+	SCALE_100_PERCENT           = 100
+	SCALE_120_PERCENT           = 120
+	SCALE_125_PERCENT           = 125
+	SCALE_140_PERCENT           = 140
+	SCALE_150_PERCENT           = 150
+	SCALE_160_PERCENT           = 160
+	SCALE_175_PERCENT           = 175
+	SCALE_180_PERCENT           = 180
+	SCALE_200_PERCENT           = 200
+	SCALE_225_PERCENT           = 225
+	SCALE_250_PERCENT           = 250
+	SCALE_300_PERCENT           = 300
+	SCALE_350_PERCENT           = 350
+	SCALE_400_PERCENT           = 400
+	SCALE_450_PERCENT           = 450
+	SCALE_500_PERCENT           = 500
+)

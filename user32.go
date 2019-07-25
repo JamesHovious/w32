@@ -11,6 +11,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+
 	//"regexp"
 	"syscall"
 	"unicode/utf8"
@@ -136,6 +137,7 @@ var (
 	procVkKeyScanW                    = moduser32.NewProc("VkKeyScanW")
 	procVkKeyScanExW                  = moduser32.NewProc("VkKeyScanExW")
 	procWaitMessage                   = moduser32.NewProc("WaitMessage")
+	setProcessDPIAware                = moduser32.NewProc("SetProcessDPIAware")
 )
 
 func SendMessageTimeout(hwnd HWND, msg uint32, wParam, lParam uintptr, fuFlags, uTimeout uint32, lpdwResult uintptr) uintptr {
@@ -1261,11 +1263,18 @@ func VkKeyScanW(char uint16) int16 {
 }
 
 // Translates a character to the corresponding virtual-key code and shift state.
-//See https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-vkkeyscanexw
+// See https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-vkkeyscanexw
 func VkKeyScanExW(char uint16, hkl HKL) int16 {
 	ret, _, _ := procVkKeyScanExW.Call(
 		uintptr(char),
 		uintptr(hkl),
 	)
 	return int16(ret)
+}
+
+// Sets the process-default DPI awareness to system-DPI awareness.
+// See https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setprocessdpiaware
+func SetProcessDPIAware() bool {
+	ret, _, _ := setProcessDPIAware.Call()
+	return ret != 0
 }
