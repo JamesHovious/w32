@@ -14,6 +14,7 @@ var (
 	modkernel32                    = syscall.NewLazyDLL("kernel32.dll")
 	procCopyMemory                 = modkernel32.NewProc("RtlCopyMemory")
 	procCloseHandle                = modkernel32.NewProc("CloseHandle")
+	procConnectNamedPipe           = modkernel32.NewProc("ConnectNamedPipe")
 	procCreateFileW                = modkernel32.NewProc("CreateFileW")
 	procCreateNamedPipeW           = modkernel32.NewProc("CreateNamedPipeW")
 	procCreateProcessA             = modkernel32.NewProc("CreateProcessA")
@@ -241,6 +242,17 @@ func CreateFile(
 		return HANDLE(handle), err
 	}
 	return HANDLE(handle), err
+}
+
+func ConnectNamedPipe(handle HANDLE, overlapped *OVERLAPPED) (bool, error) {
+	ok, _, err := procConnectNamedPipe.Call(
+		uintptr(handle),
+		uintptr(unsafe.Pointer(overlapped)),
+	)
+	if IsErrSuccess(err) {
+		return ok != 0, err
+	}
+	return ok != 0, nil
 }
 
 func CreateNamedPipe(
