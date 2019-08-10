@@ -67,6 +67,7 @@ var (
 	procVirtualQuery               = modkernel32.NewProc("VirtualQuery")
 	procVirtualQueryEx             = modkernel32.NewProc("VirtualQueryEx")
 	procWaitForSingleObject        = modkernel32.NewProc("WaitForSingleObject")
+	procWriteFile                  = modkernel32.NewProc("WriteFile")
 	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 
 	procResumeThread  = modkernel32.NewProc("ResumeThread")
@@ -691,6 +692,20 @@ func SetSystemTime(time *SYSTEMTIME) (err error) {
 	}
 	err = nil
 	return
+}
+
+func WriteFile(handle HANDLE, buf []byte, written *uint32, overlapped *OVERLAPPED) (bool, error) {
+	ok, _, err := procWriteFile.Call(
+		uintptr(handle),
+		uintptr(unsafe.Pointer(&buf[0])),
+		uintptr(len(buf)),
+		uintptr(unsafe.Pointer(&written)),
+		uintptr(unsafe.Pointer(overlapped)),
+	)
+	if !IsErrSuccess(err) {
+		return ok != 0, err
+	}
+	return ok != 0, err
 }
 
 //Writes data to an area of memory in a specified process. The entire area to be written to must be accessible or the operation fails.
