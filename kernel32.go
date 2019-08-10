@@ -14,6 +14,7 @@ var (
 	modkernel32                    = syscall.NewLazyDLL("kernel32.dll")
 	procCopyMemory                 = modkernel32.NewProc("RtlCopyMemory")
 	procCloseHandle                = modkernel32.NewProc("CloseHandle")
+	procCreateFileW                = modkernel32.NewProc("CreateFileW")
 	procCreateProcessA             = modkernel32.NewProc("CreateProcessA")
 	procCreateProcessW             = modkernel32.NewProc("CreateProcessW")
 	procCreateRemoteThread         = modkernel32.NewProc("CreateRemoteThread")
@@ -215,6 +216,30 @@ func VirtualProtect(lpAddress uintptr, dwSize int, flNewProtect int, lpflOldProt
 		uintptr(flNewProtect),
 		uintptr(unsafe.Pointer(lpflOldProtect)))
 	return ret != 0
+}
+
+func CreateFile(
+	name string,
+	desiredAccess DWORD,
+	shareMode DWORD,
+	securityAttributes *SECURITY_ATTRIBUTES,
+	creationDisposition DWORD,
+	flagsAndAttributes DWORD,
+	templateFile HANDLE,
+) (HANDLE, error) {
+	handle, _, err := procCreateFileW.Call(
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(name))),
+		uintptr(desiredAccess),
+		uintptr(shareMode),
+		uintptr(unsafe.Pointer(securityAttributes)),
+		uintptr(creationDisposition),
+		uintptr(flagsAndAttributes),
+		uintptr(templateFile),
+	)
+	if !IsErrSuccess(err) {
+		return HANDLE(handle), err
+	}
+	return HANDLE(handle), err
 }
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682425(v=vs.85).aspx
