@@ -15,6 +15,7 @@ var (
 	procCopyMemory                 = modkernel32.NewProc("RtlCopyMemory")
 	procCloseHandle                = modkernel32.NewProc("CloseHandle")
 	procCreateFileW                = modkernel32.NewProc("CreateFileW")
+	procCreateNamedPipeW           = modkernel32.NewProc("CreateNamedPipeW")
 	procCreateProcessA             = modkernel32.NewProc("CreateProcessA")
 	procCreateProcessW             = modkernel32.NewProc("CreateProcessW")
 	procCreateRemoteThread         = modkernel32.NewProc("CreateRemoteThread")
@@ -242,6 +243,32 @@ func CreateFile(
 	return HANDLE(handle), err
 }
 
+func CreateNamedPipe(
+	name string,
+	openMode DWORD,
+	pipeMode DWORD,
+	maxInstances DWORD,
+	outBufferSize DWORD,
+	inBufferSize DWORD,
+	defaultTimeOut DWORD,
+	securityAttributes *SECURITY_ATTRIBUTES,
+) (HANDLE, error) {
+	handle, _, err := procCreateNamedPipeW.Call(
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(name))),
+		uintptr(openMode),
+		uintptr(pipeMode),
+		uintptr(maxInstances),
+		uintptr(outBufferSize),
+		uintptr(inBufferSize),
+		uintptr(defaultTimeOut),
+		uintptr(unsafe.Pointer(securityAttributes)),
+	)
+	if !IsErrSuccess(err) {
+		return INVALID_HANDLE, err
+	}
+	return HANDLE(handle), nil
+}
+
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682425(v=vs.85).aspx
 func CreateProcessA(lpApplicationName *string,
 	lpCommandLine string,
@@ -331,7 +358,7 @@ func GetProcAddress(hProcess HANDLE, procname string) (addr uintptr, err error) 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682437(v=vs.85).aspx
 // Credit: https://github.com/contester/runlib/blob/master/win32/win32_windows.go#L577
 func CreateRemoteThread(hprocess HANDLE, sa *syscall.SecurityAttributes,
-	stackSize uint32, startAddress uint32, parameter uintptr, creationFlags uint32) (syscall.Handle, uint32, error) {
+	stackSize uint32, startAddress uint32, parameter uintptr, creationFlags uint32) (HANDLE, uint32, error) {
 	var threadId uint32
 	r1, _, e1 := procCreateRemoteThread.Call(
 		uintptr(hprocess),
@@ -343,9 +370,9 @@ func CreateRemoteThread(hprocess HANDLE, sa *syscall.SecurityAttributes,
 		uintptr(unsafe.Pointer(&threadId)))
 
 	if int(r1) == 0 {
-		return syscall.InvalidHandle, 0, e1
+		return INVALID_HANDLE, 0, e1
 	}
-	return syscall.Handle(r1), threadId, nil
+	return HANDLE(r1), threadId, nil
 }
 
 func GetModuleHandle(modulename string) HINSTANCE {
