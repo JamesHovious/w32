@@ -1296,3 +1296,22 @@ type SYSTEM_INFO struct {
 	ProcessorLevel            uint16
 	ProcessorRevision         uint16
 }
+
+type NOTIFYICONDATAA struct {
+	cbSize DWORD
+	hWnd HWND
+	uID uint32
+	uFlags uint32
+	uCallbackMessage uint32
+	hIcon HICON
+	szTip [64]int8
+	dwState DWORD
+	dwStateMask DWORD
+	szInfo [256]int8
+	uTimeout uint32
+	uVersion uint32
+	szInfoTitle [256]int8
+	dwInfoFlags DWORD
+	guidItem GUID
+	hBalloonIcon HICON
+}

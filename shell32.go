@@ -22,6 +22,7 @@ var (
 	procSHBrowseForFolder   = modshell32.NewProc("SHBrowseForFolderW")
 	procSHGetPathFromIDList = modshell32.NewProc("SHGetPathFromIDListW")
 	procShellExecute        = modshell32.NewProc("ShellExecuteW")
+	procShellNotifyIconA    = modshell32.NewProc("Shell_NotifyIconA")
 )
 
 func SHBrowseForFolder(bi *BROWSEINFO) uintptr {
@@ -32,7 +33,7 @@ func SHBrowseForFolder(bi *BROWSEINFO) uintptr {
 
 func SHGetPathFromIDList(idl uintptr) string {
 	buf := make([]uint16, 1024)
-	procSHGetPathFromIDList.Call(
+	_, _, _ = procSHGetPathFromIDList.Call(
 		idl,
 		uintptr(unsafe.Pointer(&buf[0])))
 
@@ -40,7 +41,7 @@ func SHGetPathFromIDList(idl uintptr) string {
 }
 
 func DragAcceptFiles(hwnd HWND, accept bool) {
-	procDragAcceptFiles.Call(
+	_, _, _ = procDragAcceptFiles.Call(
 		uintptr(hwnd),
 		uintptr(BoolToBOOL(accept)))
 }
@@ -83,7 +84,7 @@ func DragQueryPoint(hDrop HDROP) (x, y int, isClientArea bool) {
 }
 
 func DragFinish(hDrop HDROP) {
-	procDragFinish.Call(uintptr(hDrop))
+	_, _, _ = procDragFinish.Call(uintptr(hDrop))
 }
 
 func ShellExecute(hwnd HWND, lpOperation, lpFile, lpParameters, lpDirectory string, nShowCmd int) error {
@@ -150,4 +151,11 @@ func ExtractIcon(lpszExeFileName string, nIconIndex int) HICON {
 		uintptr(nIconIndex))
 
 	return HICON(ret)
+}
+
+func ShellNotifyIconA(dwMessage DWORD, lpData *NOTIFYICONDATAA) bool {
+	_, _, _ = procShellNotifyIconA.Call(
+		uintptr(dwMessage),
+		uintptr(unsafe.Pointer(lpData)),
+	)
 }
