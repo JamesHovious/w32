@@ -14,6 +14,9 @@ var (
 	modkernel32                    = syscall.NewLazyDLL("kernel32.dll")
 	procCopyMemory                 = modkernel32.NewProc("RtlCopyMemory")
 	procCloseHandle                = modkernel32.NewProc("CloseHandle")
+	procConnectNamedPipe           = modkernel32.NewProc("ConnectNamedPipe")
+	procCreateFileW                = modkernel32.NewProc("CreateFileW")
+	procCreateNamedPipeW           = modkernel32.NewProc("CreateNamedPipeW")
 	procCreateProcessA             = modkernel32.NewProc("CreateProcessA")
 	procCreateProcessW             = modkernel32.NewProc("CreateProcessW")
 	procCreateRemoteThread         = modkernel32.NewProc("CreateRemoteThread")
@@ -64,6 +67,7 @@ var (
 	procVirtualQuery               = modkernel32.NewProc("VirtualQuery")
 	procVirtualQueryEx             = modkernel32.NewProc("VirtualQueryEx")
 	procWaitForSingleObject        = modkernel32.NewProc("WaitForSingleObject")
+	procWriteFile                  = modkernel32.NewProc("WriteFile")
 	procWriteProcessMemory         = modkernel32.NewProc("WriteProcessMemory")
 
 	procResumeThread  = modkernel32.NewProc("ResumeThread")
@@ -217,6 +221,67 @@ func VirtualProtect(lpAddress uintptr, dwSize int, flNewProtect int, lpflOldProt
 	return ret != 0
 }
 
+func CreateFile(
+	name string,
+	desiredAccess DWORD,
+	shareMode DWORD,
+	securityAttributes *SECURITY_ATTRIBUTES,
+	creationDisposition DWORD,
+	flagsAndAttributes DWORD,
+	templateFile HANDLE,
+) (HANDLE, error) {
+	handle, _, err := procCreateFileW.Call(
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(name))),
+		uintptr(desiredAccess),
+		uintptr(shareMode),
+		uintptr(unsafe.Pointer(securityAttributes)),
+		uintptr(creationDisposition),
+		uintptr(flagsAndAttributes),
+		uintptr(templateFile),
+	)
+	if !IsErrSuccess(err) {
+		return HANDLE(handle), err
+	}
+	return HANDLE(handle), err
+}
+
+func ConnectNamedPipe(handle HANDLE, overlapped *OVERLAPPED) (bool, error) {
+	ok, _, err := procConnectNamedPipe.Call(
+		uintptr(handle),
+		uintptr(unsafe.Pointer(overlapped)),
+	)
+	if IsErrSuccess(err) {
+		return ok != 0, err
+	}
+	return ok != 0, nil
+}
+
+func CreateNamedPipe(
+	name string,
+	openMode DWORD,
+	pipeMode DWORD,
+	maxInstances DWORD,
+	outBufferSize DWORD,
+	inBufferSize DWORD,
+	defaultTimeOut DWORD,
+	securityAttributes *SECURITY_ATTRIBUTES,
+) (HANDLE, error) {
+	handle, _, err := procCreateNamedPipeW.Call(
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(name))),
+		uintptr(openMode),
+		uintptr(pipeMode),
+		uintptr(maxInstances),
+		uintptr(outBufferSize),
+		uintptr(inBufferSize),
+		uintptr(defaultTimeOut),
+		uintptr(unsafe.Pointer(securityAttributes)),
+	)
+	if !IsErrSuccess(err) {
+		return INVALID_HANDLE, err
+	}
+	return HANDLE(handle), nil
+}
+
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682425(v=vs.85).aspx
 func CreateProcessA(lpApplicationName *string,
 	lpCommandLine string,
@@ -306,7 +371,7 @@ func GetProcAddress(hProcess HANDLE, procname string) (addr uintptr, err error) 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682437(v=vs.85).aspx
 // Credit: https://github.com/contester/runlib/blob/master/win32/win32_windows.go#L577
 func CreateRemoteThread(hprocess HANDLE, sa *syscall.SecurityAttributes,
-	stackSize uint32, startAddress uint32, parameter uintptr, creationFlags uint32) (syscall.Handle, uint32, error) {
+	stackSize uint32, startAddress uint32, parameter uintptr, creationFlags uint32) (HANDLE, uint32, error) {
 	var threadId uint32
 	r1, _, e1 := procCreateRemoteThread.Call(
 		uintptr(hprocess),
@@ -318,9 +383,9 @@ func CreateRemoteThread(hprocess HANDLE, sa *syscall.SecurityAttributes,
 		uintptr(unsafe.Pointer(&threadId)))
 
 	if int(r1) == 0 {
-		return syscall.InvalidHandle, 0, e1
+		return INVALID_HANDLE, 0, e1
 	}
-	return syscall.Handle(r1), threadId, nil
+	return HANDLE(r1), threadId, nil
 }
 
 func GetModuleHandle(modulename string) HINSTANCE {
@@ -627,6 +692,20 @@ func SetSystemTime(time *SYSTEMTIME) (err error) {
 	}
 	err = nil
 	return
+}
+
+func WriteFile(handle HANDLE, buf []byte, written *uint32, overlapped *OVERLAPPED) (bool, error) {
+	ok, _, err := procWriteFile.Call(
+		uintptr(handle),
+		uintptr(unsafe.Pointer(&buf[0])),
+		uintptr(len(buf)),
+		uintptr(unsafe.Pointer(&written)),
+		uintptr(unsafe.Pointer(overlapped)),
+	)
+	if !IsErrSuccess(err) {
+		return ok != 0, err
+	}
+	return ok != 0, err
 }
 
 //Writes data to an area of memory in a specified process. The entire area to be written to must be accessible or the operation fails.

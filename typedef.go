@@ -971,6 +971,14 @@ type SECURITY_DESCRIPTOR struct {
 	Dacl     *ACL
 }
 
+type OVERLAPPED struct {
+	Internal     uintptr
+	InternalHigh uintptr
+	Offset       uint32
+	OffsetHigh   uint32
+	HEvent       HANDLE
+}
+
 type SID_IDENTIFIER_AUTHORITY struct {
 	Value [6]byte
 }
