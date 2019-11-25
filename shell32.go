@@ -152,10 +152,3 @@ func ExtractIcon(lpszExeFileName string, nIconIndex int) HICON {
 
 	return HICON(ret)
 }
-
-func ShellNotifyIconA(dwMessage DWORD, lpData *NOTIFYICONDATAA) bool {
-	_, _, _ = procShellNotifyIconA.Call(
-		uintptr(dwMessage),
-		uintptr(unsafe.Pointer(lpData)),
-	)
-}
