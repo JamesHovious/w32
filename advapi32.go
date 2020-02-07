@@ -285,6 +285,38 @@ func RegGetString(hKey HKEY, subKey string, value string) string {
 	return syscall.UTF16ToString(buf)
 }
 
+func RegGetStringArray(hKey HKEY, subKey string, value string) []string {
+	var bufLen uint32
+	procRegGetValue.Call(
+		uintptr(hKey),
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(subKey))),
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(value))),
+		uintptr(RRF_RT_REG_MULTI_SZ),
+		0,
+		0,
+		uintptr(unsafe.Pointer(&bufLen)))
+
+	if bufLen == 0 {
+		return nil
+	}
+
+	buf := make([]uint16, bufLen)
+	ret, _, _ := procRegGetValue.Call(
+		uintptr(hKey),
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(subKey))),
+		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(value))),
+		uintptr(RRF_RT_REG_MULTI_SZ),
+		0,
+		uintptr(unsafe.Pointer(&buf[0])),
+		uintptr(unsafe.Pointer(&bufLen)))
+
+	if ret != ERROR_SUCCESS {
+		return nil
+	}
+
+	return UTF16ToStringArray(buf)
+}
+
 func RegGetUint32(hKey HKEY, subKey string, value string) (data uint32, errno int) {
 	var dataLen uint32 = uint32(unsafe.Sizeof(data))
 	ret, _, _ := procRegGetValue.Call(

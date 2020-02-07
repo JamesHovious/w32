@@ -55,6 +55,24 @@ func UTF16PtrToString(cstr *uint16) string {
 	return ""
 }
 
+func UTF16ToStringArray(s []uint16) []string {
+	var ret []string
+begin:
+	for i, v := range s {
+		if v == 0 {
+			tmp := s[0:i]
+			ret = append(ret, string(utf16.Decode(tmp)))
+			if i+2 < len(s) && s[i+1] != 0 {
+				s = s[i+1:]
+				goto begin
+			} else {
+				break
+			}
+		}
+	}
+	return ret
+}
+
 func ComAddRef(unknown *IUnknown) int32 {
 	ret, _, _ := syscall.Syscall(unknown.lpVtbl.pAddRef, 1,
 		uintptr(unsafe.Pointer(unknown)),
