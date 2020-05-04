@@ -6,6 +6,7 @@ package w32
 
 import (
 	"golang.org/x/sys/windows"
+	"syscall"
 	"unsafe"
 )
 
@@ -47,7 +48,7 @@ func WglDeleteContext(hglrc HGLRC) bool {
 
 func WglGetProcAddress(szProc string) uintptr {
 	ret, _, _ := procwglGetProcAddress.Call(
-		uintptr(unsafe.Pointer(windows.StringBytePtr(szProc))),
+		uintptr(unsafe.Pointer(syscall.StringBytePtr(szProc))),
 	)
 
 	return ret

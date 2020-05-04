@@ -6,7 +6,6 @@ package w32
 
 import (
 	"golang.org/x/sys/windows"
-	"syscall"
 	"unsafe"
 )
 
