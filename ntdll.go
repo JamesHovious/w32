@@ -6,12 +6,12 @@ package w32
 
 import (
 	"fmt"
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modntdll = syscall.NewLazyDLL("ntdll.dll")
+	modntdll = windows.NewLazySystemDLL("ntdll.dll")
 
 	procAlpcGetMessageAttribute          = modntdll.NewProc("AlpcGetMessageAttribute")
 	procNtAlpcAcceptConnectPort          = modntdll.NewProc("NtAlpcAcceptConnectPort")

@@ -5,12 +5,12 @@
 package w32
 
 import (
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modgdi32 = syscall.NewLazyDLL("gdi32.dll")
+	modgdi32 = windows.NewLazySystemDLL("gdi32.dll")
 
 	procAbortDoc                  = modgdi32.NewProc("AbortDoc")
 	procBitBlt                    = modgdi32.NewProc("BitBlt")

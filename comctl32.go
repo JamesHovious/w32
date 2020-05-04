@@ -5,12 +5,12 @@
 package w32
 
 import (
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modcomctl32 = syscall.NewLazyDLL("comctl32.dll")
+	modcomctl32 = windows.NewLazySystemDLL("comctl32.dll")
 
 	procImageList_Add           = modcomctl32.NewProc("ImageList_Add")
 	procImageList_Create        = modcomctl32.NewProc("ImageList_Create")

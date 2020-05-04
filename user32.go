@@ -11,6 +11,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"golang.org/x/sys/windows"
 
 	//"regexp"
 	"syscall"
@@ -19,7 +20,7 @@ import (
 )
 
 var (
-	moduser32 = syscall.NewLazyDLL("user32.dll")
+	moduser32 = windows.NewLazySystemDLL("user32.dll")
 
 	procAddClipboardFormatListener    = moduser32.NewProc("AddClipboardFormatListener")
 	procAdjustWindowRect              = moduser32.NewProc("AdjustWindowRect")
@@ -161,7 +162,7 @@ func GetClassNameW(hwnd HWND) string {
 		uintptr(unsafe.Pointer(&buf[0])),
 		uintptr(255))
 
-	return syscall.UTF16ToString(buf)
+	return windows.UTF16ToString(buf)
 }
 
 // https://github.com/AllenDang/w32/pull/62/commits/bf59645b86663a54dffb94ca82683cc0610a6de3
@@ -186,11 +187,11 @@ func FindWindowExW(hwndParent, hwndChildAfter HWND, className, windowName *uint1
 func FindWindowExS(hwndParent, hwndChildAfter HWND, className, windowName *string) HWND {
 	var class *uint16 = nil
 	if className != nil {
-		class = syscall.StringToUTF16Ptr(*className)
+		class = windows.StringToUTF16Ptr(*className)
 	}
 	var window *uint16 = nil
 	if windowName != nil {
-		window = syscall.StringToUTF16Ptr(*windowName)
+		window = windows.StringToUTF16Ptr(*windowName)
 	}
 	return FindWindowExW(hwndParent, hwndChildAfter, class, window)
 }
@@ -207,11 +208,11 @@ func FindWindowW(className, windowName *uint16) HWND {
 func FindWindowS(className, windowName *string) HWND {
 	var class *uint16 = nil
 	if className != nil {
-		class = syscall.StringToUTF16Ptr(*className)
+		class = windows.StringToUTF16Ptr(*className)
 	}
 	var window *uint16 = nil
 	if windowName != nil {
-		window = syscall.StringToUTF16Ptr(*windowName)
+		window = windows.StringToUTF16Ptr(*windowName)
 	}
 	return FindWindowW(class, window)
 }
@@ -220,7 +221,7 @@ func FindWindowS(className, windowName *string) HWND {
 func EnumChildWindows(hWndParent HWND, lpEnumFunc WNDENUMPROC, lParam LPARAM) bool {
 	ret, _, _ := procEnumChildWindows.Call(
 		uintptr(hWndParent),
-		uintptr(syscall.NewCallback(lpEnumFunc)),
+		uintptr(windows.NewCallback(lpEnumFunc)),
 		uintptr(lParam),
 	)
 
@@ -267,7 +268,7 @@ func LoadIcon(instance HINSTANCE, iconName *uint16) HICON {
 func LoadIconS(instance HINSTANCE, iconName *string) HICON {
 	var icon *uint16 = nil
 	if iconName != nil {
-		icon = syscall.StringToUTF16Ptr(*iconName)
+		icon = windows.StringToUTF16Ptr(*iconName)
 	}
 	return LoadIcon(instance, icon)
 }
@@ -284,7 +285,7 @@ func LoadCursor(instance HINSTANCE, cursorName *uint16) HCURSOR {
 func LoadCursorS(instance HINSTANCE, cursorName *string) HCURSOR {
 	var cursor *uint16 = nil
 	if cursorName != nil {
-		cursor = syscall.StringToUTF16Ptr(*cursorName)
+		cursor = windows.StringToUTF16Ptr(*cursorName)
 	}
 	return LoadCursor(instance, cursor)
 }
@@ -329,11 +330,11 @@ func CreateWindowExS(exStyle uint, className, windowName *string,
 	instance HINSTANCE, param unsafe.Pointer) HWND {
 	var class *uint16 = nil
 	if className != nil {
-		class = syscall.StringToUTF16Ptr(*className)
+		class = windows.StringToUTF16Ptr(*className)
 	}
 	var window *uint16 = nil
 	if windowName != nil {
-		window = syscall.StringToUTF16Ptr(*windowName)
+		window = windows.StringToUTF16Ptr(*windowName)
 	}
 	return CreateWindowEx(
 		exStyle,
@@ -456,7 +457,7 @@ func WaitMessage() bool {
 func SetWindowText(hwnd HWND, text string) {
 	procSetWindowText.Call(
 		uintptr(hwnd),
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(text))))
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(text))))
 }
 
 func GetWindowTextLength(hwnd HWND) int {
@@ -475,7 +476,7 @@ func GetWindowText(hwnd HWND) string {
 		uintptr(unsafe.Pointer(&buf[0])),
 		uintptr(textLen))
 
-	return syscall.UTF16ToString(buf)
+	return windows.UTF16ToString(buf)
 }
 
 func GetWindowRect(hwnd HWND) *RECT {
@@ -644,8 +645,8 @@ func GetWindowThreadProcessId(hwnd HWND) (HANDLE, int) {
 func MessageBox(hwnd HWND, text, caption string, flags uint) int {
 	ret, _, _ := procMessageBox.Call(
 		uintptr(hwnd),
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(text))),
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(caption))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(text))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(caption))),
 		uintptr(flags))
 
 	return int(ret)
@@ -875,7 +876,7 @@ func FillRect(hDC HDC, lprc *RECT, hbr HBRUSH) bool {
 func DrawText(hDC HDC, text string, uCount int, lpRect *RECT, uFormat uint) int {
 	ret, _, _ := procDrawText.Call(
 		uintptr(hDC),
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(text))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(text))),
 		uintptr(uCount),
 		uintptr(unsafe.Pointer(lpRect)),
 		uintptr(uFormat))
@@ -939,7 +940,7 @@ func GetClipboardFormatName(format uint) (string, bool) {
 		uintptr(cchMaxCount))
 
 	if ret > 0 {
-		return syscall.UTF16ToString(buf), true
+		return windows.UTF16ToString(buf), true
 	}
 
 	return "Requested format does not exist or is predefined", false
@@ -1177,7 +1178,7 @@ func SendInputString(input string) (err error) {
 func SetWindowsHookEx(idHook int, lpfn HOOKPROC, hMod HINSTANCE, dwThreadId DWORD) HHOOK {
 	ret, _, _ := procSetWindowsHookEx.Call(
 		uintptr(idHook),
-		uintptr(syscall.NewCallback(lpfn)),
+		uintptr(windows.NewCallback(lpfn)),
 		uintptr(hMod),
 		uintptr(dwThreadId),
 	)
@@ -1191,7 +1192,7 @@ func SetWinEventHook(eventMin DWORD, eventMax DWORD, hmodWinEventProc HMODULE, p
 		uintptr(eventMin),
 		uintptr(eventMax),
 		uintptr(hmodWinEventProc),
-		uintptr(syscall.NewCallback(pfnWinEventProc)),
+		uintptr(windows.NewCallback(pfnWinEventProc)),
 		uintptr(idProcess),
 		uintptr(idThread),
 		uintptr(dwFlags),

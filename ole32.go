@@ -5,12 +5,12 @@
 package w32
 
 import (
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modole32 = syscall.NewLazyDLL("ole32.dll")
+	modole32 = windows.NewLazySystemDLL("ole32.dll")
 
 	procCoInitialize          = modole32.NewProc("CoInitialize")
 	procCoInitializeEx        = modole32.NewProc("CoInitializeEx")

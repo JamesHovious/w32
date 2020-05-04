@@ -5,12 +5,12 @@
 package w32
 
 import (
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modoleaut32 = syscall.NewLazyDLL("oleaut32")
+	modoleaut32 = windows.NewLazySystemDLL("oleaut32")
 
 	procCreateDispTypeInfo = modoleaut32.NewProc("CreateDispTypeInfo")
 	procCreateStdDispatch  = modoleaut32.NewProc("CreateStdDispatch")
@@ -29,7 +29,7 @@ func VariantInit(v *VARIANT) {
 }
 
 func SysAllocString(v string) (ss *int16) {
-	pss, _, _ := procSysAllocString.Call(uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(v))))
+	pss, _, _ := procSysAllocString.Call(uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(v))))
 	ss = (*int16)(unsafe.Pointer(pss))
 	return
 }

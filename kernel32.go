@@ -6,12 +6,12 @@ package w32
 
 import (
 	"encoding/binary"
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modkernel32                    = syscall.NewLazyDLL("kernel32.dll")
+	modkernel32                    = windows.NewLazySystemDLL("kernel32.dll")
 	procCopyMemory                 = modkernel32.NewProc("RtlCopyMemory")
 	procCloseHandle                = modkernel32.NewProc("CloseHandle")
 	procConnectNamedPipe           = modkernel32.NewProc("ConnectNamedPipe")
@@ -154,19 +154,19 @@ func CreateProcessW(
 
 	var lpAN, lpCL, lpCD *uint16
 	if len(lpApplicationName) > 0 {
-		lpAN, e = syscall.UTF16PtrFromString(lpApplicationName)
+		lpAN, e = windows.UTF16PtrFromString(lpApplicationName)
 		if e != nil {
 			return
 		}
 	}
 	if len(lpCommandLine) > 0 {
-		lpCL, e = syscall.UTF16PtrFromString(lpCommandLine)
+		lpCL, e = windows.UTF16PtrFromString(lpCommandLine)
 		if e != nil {
 			return
 		}
 	}
 	if len(lpCurrentDirectory) > 0 {
-		lpCD, e = syscall.UTF16PtrFromString(lpCurrentDirectory)
+		lpCD, e = windows.UTF16PtrFromString(lpCurrentDirectory)
 		if e != nil {
 			return
 		}
@@ -231,7 +231,7 @@ func CreateFile(
 	templateFile HANDLE,
 ) (HANDLE, error) {
 	handle, _, err := procCreateFileW.Call(
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(name))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(name))),
 		uintptr(desiredAccess),
 		uintptr(shareMode),
 		uintptr(unsafe.Pointer(securityAttributes)),
@@ -267,7 +267,7 @@ func CreateNamedPipe(
 	securityAttributes *SECURITY_ATTRIBUTES,
 ) (HANDLE, error) {
 	handle, _, err := procCreateNamedPipeW.Call(
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(name))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(name))),
 		uintptr(openMode),
 		uintptr(pipeMode),
 		uintptr(maxInstances),
@@ -285,14 +285,14 @@ func CreateNamedPipe(
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682425(v=vs.85).aspx
 func CreateProcessA(lpApplicationName *string,
 	lpCommandLine string,
-	lpProcessAttributes *syscall.SecurityAttributes,
-	lpThreadAttributes *syscall.SecurityAttributes,
+	lpProcessAttributes *windows.SecurityAttributes,
+	lpThreadAttributes *windows.SecurityAttributes,
 	bInheritHandles bool,
 	dwCreationFlags uint32,
 	lpEnvironment *string,
 	lpCurrentDirectory *uint16,
-	lpStartupInfo *syscall.StartupInfo,
-	lpProcessInformation *syscall.ProcessInformation) {
+	lpStartupInfo *windows.StartupInfo,
+	lpProcessInformation *windows.ProcessInformation) {
 
 	inherit := 0
 	if bInheritHandles {
@@ -300,8 +300,8 @@ func CreateProcessA(lpApplicationName *string,
 	}
 
 	procCreateProcessA.Call(
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(*lpApplicationName))),
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(lpCommandLine))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(*lpApplicationName))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(lpCommandLine))),
 		uintptr(unsafe.Pointer(lpProcessAttributes)),
 		uintptr(unsafe.Pointer(lpThreadAttributes)),
 		uintptr(inherit),
@@ -358,7 +358,7 @@ func GetProcAddress(hProcess HANDLE, procname string) (addr uintptr, err error) 
 	if procname == "" {
 		pn = 0
 	} else {
-		pn = uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(procname)))
+		pn = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(procname)))
 	}
 
 	ret, _, err := procGetProcAddress.Call(uintptr(hProcess), pn)
@@ -370,7 +370,7 @@ func GetProcAddress(hProcess HANDLE, procname string) (addr uintptr, err error) 
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682437(v=vs.85).aspx
 // Credit: https://github.com/contester/runlib/blob/master/win32/win32_windows.go#L577
-func CreateRemoteThread(hprocess HANDLE, sa *syscall.SecurityAttributes,
+func CreateRemoteThread(hprocess HANDLE, sa *windows.SecurityAttributes,
 	stackSize uint32, startAddress uint32, parameter uintptr, creationFlags uint32) (HANDLE, uint32, error) {
 	var threadId uint32
 	r1, _, e1 := procCreateRemoteThread.Call(
@@ -393,7 +393,7 @@ func GetModuleHandle(modulename string) HINSTANCE {
 	if modulename == "" {
 		mn = 0
 	} else {
-		mn = uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(modulename)))
+		mn = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(modulename)))
 	}
 	ret, _, _ := procGetModuleHandle.Call(mn)
 	return HINSTANCE(ret)
@@ -494,7 +494,7 @@ func FindResource(hModule HMODULE, lpName, lpType *uint16) (HRSRC, error) {
 		uintptr(unsafe.Pointer(lpType)))
 
 	if ret == 0 {
-		return 0, syscall.GetLastError()
+		return 0, windows.GetLastError()
 	}
 
 	return HRSRC(ret), nil
@@ -666,7 +666,7 @@ func SetConsoleTextAttribute(hConsoleOutput HANDLE, wAttributes uint16) bool {
 func GetDiskFreeSpaceEx(dirName string) (r bool,
 	freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes uint64) {
 	ret, _, _ := procGetDiskFreeSpaceEx.Call(
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(dirName))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(dirName))),
 		uintptr(unsafe.Pointer(&freeBytesAvailable)),
 		uintptr(unsafe.Pointer(&totalNumberOfBytes)),
 		uintptr(unsafe.Pointer(&totalNumberOfFreeBytes)))

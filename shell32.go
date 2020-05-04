@@ -7,12 +7,12 @@ package w32
 import (
 	"errors"
 	"fmt"
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modshell32 = syscall.NewLazyDLL("shell32.dll")
+	modshell32 = windows.NewLazySystemDLL("shell32.dll")
 
 	procDragAcceptFiles     = modshell32.NewProc("DragAcceptFiles")
 	procDragFinish          = modshell32.NewProc("DragFinish")
@@ -37,7 +37,7 @@ func SHGetPathFromIDList(idl uintptr) string {
 		idl,
 		uintptr(unsafe.Pointer(&buf[0])))
 
-	return syscall.UTF16ToString(buf)
+	return windows.UTF16ToString(buf)
 }
 
 func DragAcceptFiles(hwnd HWND, accept bool) {
@@ -68,7 +68,7 @@ func DragQueryFile(hDrop HDROP, iFile uint) (fileName string, fileCount uint) {
 			panic("Invoke DragQueryFile error.")
 		}
 
-		fileName = syscall.UTF16ToString(buf)
+		fileName = windows.UTF16ToString(buf)
 	}
 
 	return
@@ -90,19 +90,19 @@ func DragFinish(hDrop HDROP) {
 func ShellExecute(hwnd HWND, lpOperation, lpFile, lpParameters, lpDirectory string, nShowCmd int) error {
 	var op, param, directory uintptr
 	if len(lpOperation) != 0 {
-		op = uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(lpOperation)))
+		op = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(lpOperation)))
 	}
 	if len(lpParameters) != 0 {
-		param = uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(lpParameters)))
+		param = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(lpParameters)))
 	}
 	if len(lpDirectory) != 0 {
-		directory = uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(lpDirectory)))
+		directory = uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(lpDirectory)))
 	}
 
 	ret, _, _ := procShellExecute.Call(
 		uintptr(hwnd),
 		op,
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(lpFile))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(lpFile))),
 		param,
 		directory,
 		uintptr(nShowCmd))
@@ -147,7 +147,7 @@ func ShellExecute(hwnd HWND, lpOperation, lpFile, lpParameters, lpDirectory stri
 func ExtractIcon(lpszExeFileName string, nIconIndex int) HICON {
 	ret, _, _ := procExtractIcon.Call(
 		0,
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(lpszExeFileName))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(lpszExeFileName))),
 		uintptr(nIconIndex))
 
 	return HICON(ret)

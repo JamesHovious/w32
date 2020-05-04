@@ -7,7 +7,7 @@ package w32
 import (
 	"errors"
 	"fmt"
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
@@ -89,7 +89,7 @@ func GetGpStatus(s int32) string {
 var (
 	token uintptr
 
-	modgdiplus = syscall.NewLazyDLL("gdiplus.dll")
+	modgdiplus = windows.NewLazySystemDLL("gdiplus.dll")
 
 	procGdipCreateBitmapFromFile     = modgdiplus.NewProc("GdipCreateBitmapFromFile")
 	procGdipCreateBitmapFromHBITMAP  = modgdiplus.NewProc("GdipCreateBitmapFromHBITMAP")
@@ -104,7 +104,7 @@ var (
 func GdipCreateBitmapFromFile(filename string) (*uintptr, error) {
 	var bitmap *uintptr
 	ret, _, _ := procGdipCreateBitmapFromFile.Call(
-		uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(filename))),
+		uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(filename))),
 		uintptr(unsafe.Pointer(&bitmap)))
 
 	if ret != Ok {

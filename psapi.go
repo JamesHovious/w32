@@ -5,12 +5,12 @@
 package w32
 
 import (
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modpsapi = syscall.NewLazyDLL("psapi.dll")
+	modpsapi = windows.NewLazySystemDLL("psapi.dll")
 
 	procEnumProcesses = modpsapi.NewProc("EnumProcesses")
 )

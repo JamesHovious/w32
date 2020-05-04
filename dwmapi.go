@@ -6,7 +6,7 @@ package w32
 
 import (
 	"fmt"
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
@@ -18,7 +18,7 @@ import (
 // DwmGetGraphicsStreamTransformHint
 
 var (
-	moddwmapi = syscall.NewLazyDLL("dwmapi.dll")
+	moddwmapi = windows.NewLazySystemDLL("dwmapi.dll")
 
 	procDwmDefWindowProc                 = moddwmapi.NewProc("DwmDefWindowProc")
 	procDwmEnableBlurBehindWindow        = moddwmapi.NewProc("DwmEnableBlurBehindWindow")

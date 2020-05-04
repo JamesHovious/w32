@@ -5,12 +5,12 @@
 package w32
 
 import (
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modshcore = syscall.NewLazyDLL("Shcore.dll")
+	modshcore = windows.NewLazySystemDLL("Shcore.dll")
 
 	getScaleFactorForMonitor = modshcore.NewProc("GetScaleFactorForMonitor")
 )

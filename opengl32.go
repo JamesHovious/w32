@@ -5,12 +5,12 @@
 package w32
 
 import (
-	"syscall"
+	"golang.org/x/sys/windows"
 	"unsafe"
 )
 
 var (
-	modopengl32 = syscall.NewLazyDLL("opengl32.dll")
+	modopengl32 = windows.NewLazySystemDLL("opengl32.dll")
 
 	procwglCreateContext      = modopengl32.NewProc("wglCreateContext")
 	procwglCreateLayerContext = modopengl32.NewProc("wglCreateLayerContext")
@@ -47,7 +47,7 @@ func WglDeleteContext(hglrc HGLRC) bool {
 
 func WglGetProcAddress(szProc string) uintptr {
 	ret, _, _ := procwglGetProcAddress.Call(
-		uintptr(unsafe.Pointer(syscall.StringBytePtr(szProc))),
+		uintptr(unsafe.Pointer(windows.StringBytePtr(szProc))),
 	)
 
 	return ret

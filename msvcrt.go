@@ -1,9 +1,9 @@
 package w32
 
-import "syscall"
+import "golang.org/x/sys/windows"
 
 var (
-	modmsvcrt  = syscall.NewLazyDLL("msvcrt.dll")
+	modmsvcrt  = windows.NewLazySystemDLL("msvcrt.dll")
 	procMemCpy = modmsvcrt.NewProc("memcpy")
 	procStrLen = modmsvcrt.NewProc("strlen")
 )

@@ -5,12 +5,13 @@
 package w32
 
 import (
+	"golang.org/x/sys/windows"
 	"syscall"
 	"unsafe"
 )
 
 var (
-	modcomdlg32 = syscall.NewLazyDLL("comdlg32.dll")
+	modcomdlg32 = windows.NewLazySystemDLL("comdlg32.dll")
 
 	procCommDlgExtendedError = modcomdlg32.NewProc("CommDlgExtendedError")
 	procGetOpenFileName      = modcomdlg32.NewProc("GetOpenFileNameW")
