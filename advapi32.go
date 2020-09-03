@@ -16,6 +16,7 @@ var (
 
 	//	procRegSetKeyValue     = modadvapi32.NewProc("RegSetKeyValueW")
 	procCloseEventLog                = modadvapi32.NewProc("CloseEventLog")
+	procGetNumberOfEventLogRecords   = modadvapi32.NewProc("GetNumberOfEventLogRecords")
 	procCloseServiceHandle           = modadvapi32.NewProc("CloseServiceHandle")
 	procControlService               = modadvapi32.NewProc("ControlService")
 	procControlTrace                 = modadvapi32.NewProc("ControlTraceW")
@@ -37,6 +38,20 @@ var (
 	procStartService                 = modadvapi32.NewProc("StartServiceW")
 	procStartTrace                   = modadvapi32.NewProc("StartTraceW")
 )
+
+// https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getnumberofeventlogrecords
+func GetNumberOfEventLogRecords(hEventLog HANDLE, NumberOfRecords *uint32) error {
+
+	ret, _, _ := procGetNumberOfEventLogRecords.Call(
+		uintptr(hEventLog),
+		uintptr(unsafe.Pointer(NumberOfRecords)),
+	)
+
+	if ret != ERROR_SUCCESS {
+		return nil
+	}
+	return fmt.Errorf("error: 0x%x", ret)
+}
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/aa379583(v=vs.85).aspx
 func SetSecurityDescriptorDacl(pSecurityDescriptor *SECURITY_DESCRIPTOR, pDacl *ACL) (e error) {
