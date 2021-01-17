@@ -20,6 +20,8 @@ var (
 	procNtAlpcCreatePort                 = modntdll.NewProc("NtAlpcCreatePort")
 	procNtAlpcDisconnectPort             = modntdll.NewProc("NtAlpcDisconnectPort")
 	procNtAlpcSendWaitReceivePort        = modntdll.NewProc("NtAlpcSendWaitReceivePort")
+	procNtResumeProcess                  = modntdll.NewProc("NtResumeProcess")
+	procNtSuspendProcess                 = modntdll.NewProc("NtSuspendProcess")
 	procRtlCreateUnicodeStringFromAsciiz = modntdll.NewProc("RtlCreateUnicodeStringFromAsciiz") // TODO
 	procZwAllocateVirtualMemory          = modntdll.NewProc("ZwAllocateVirtualMemory")
 )
@@ -145,4 +147,20 @@ func NtAlpcDisconnectPort(hPort HANDLE, flags uint32) (e error) {
 		e = fmt.Errorf("0x%x", ret)
 	}
 	return
+}
+
+// NtSuspendProcess is undocumented but enables
+// suspending processes by passing the PID.
+//
+// https://stackoverflow.com/a/11010508/9872288
+func NtSuspendProcess(processHandle HANDLE) {
+	procNtSuspendProcess.Call(uintptr(processHandle))
+}
+
+// NtResumeProcess is undocumented but enables
+// resuming processes by passing the PID.
+//
+// https://stackoverflow.com/a/11010508/9872288
+func NtResumeProcess(processHandle HANDLE) {
+	procNtResumeProcess.Call(uintptr(processHandle))
 }
