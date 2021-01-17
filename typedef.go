@@ -937,6 +937,8 @@ type HOOKPROC func(int, WPARAM, LPARAM) LRESULT
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633498(v=vs.85).aspx
 type WNDENUMPROC func(HWND, LPARAM) LRESULT
 
+type MONITORENUMPROC func(HMONITOR, HDC, RECT, LPARAM) bool
+
 //https://msdn.microsoft.com/en-us/library/windows/desktop/aa366775(v=vs.85).aspx
 type MEMORY_BASIC_INFORMATION struct {
 	BaseAddress       PVOID
