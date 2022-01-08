@@ -63,6 +63,7 @@ var (
 	procGetDC                         = moduser32.NewProc("GetDC")
 	procGetDlgItem                    = moduser32.NewProc("GetDlgItem")
 	procGetForegroundWindow           = moduser32.NewProc("GetForegroundWindow")
+	procGetKeyNameText                = moduser32.NewProc("GetKeyNameTextW")
 	procGetKeyState                   = moduser32.NewProc("GetKeyState")
 	procGetKeyboardState              = moduser32.NewProc("GetKeyboardState")
 	procGetMessage                    = moduser32.NewProc("GetMessageW")
@@ -1283,4 +1284,25 @@ func VkKeyScanExW(char uint16, hkl HKL) int16 {
 func SetProcessDPIAware() bool {
 	ret, _, _ := setProcessDPIAware.Call()
 	return ret != 0
+}
+
+func GetKeyNameText(scanCode uint32, extended, doNotCare bool) (string, bool) {
+	buf := make([]uint16, 255)
+	var lParam = uint64(scanCode)
+	lParam <<= 16
+	if extended {
+		lParam |= 1 << 24
+	}
+
+	if doNotCare {
+		lParam |= 1 << 25
+	}
+
+	ret, _, _ := procGetKeyNameText.Call(
+		uintptr(lParam),
+		uintptr(unsafe.Pointer(&buf[0])),
+		255,
+	)
+
+	return syscall.UTF16ToString(buf), ret != 0
 }
