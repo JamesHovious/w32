@@ -1325,3 +1325,10 @@ type NOTIFYICONDATAA struct {
 	guidItem GUID
 	hBalloonIcon HICON
 }
+
+type MOUSEHOOKSTRUCT struct {
+	Pt           POINT
+	Hwnd         HWND
+	WHitTestCode uint32
+	DwExtraInfo  ULONG_PTR
+}
