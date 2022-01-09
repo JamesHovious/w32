@@ -1332,3 +1332,12 @@ type MOUSEHOOKSTRUCT struct {
 	WHitTestCode uint32
 	DwExtraInfo  ULONG_PTR
 }
+
+type MSLLHOOKSTRUCT struct {
+	Pt          POINT
+	MouseData   DWORD
+	Flags       DWORD
+	Time        DWORD
+	DwExtraInfo ULONG_PTR
+}
+
